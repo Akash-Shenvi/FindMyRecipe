@@ -21,23 +21,27 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-100 to-yellow-200 p-4">
-      <div className="bg-white shadow-2xl rounded-2xl p-8 w-full max-w-sm border-t-8 border-orange-400">
-        <h1 className="text-3xl font-extrabold text-center text-orange-600 mb-2">
+    <div className="min-h-screen flex items-center justify-center relative p-6 bg-gray-100">
+      {/* Background Image */}
+      <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=1470&q=80')] bg-cover bg-center opacity-30 z-0"></div>
+
+      {/* Login Card */}
+      <div className="relative z-10 bg-white bg-opacity-90 rounded-2xl shadow-2xl p-12 w-full max-w-xl border-t-8 border-indigo-500">
+        <h1 className="text-4xl font-extrabold text-center text-indigo-600 mb-4">
           🍽️ Find My Recipe
         </h1>
-        <p className="text-center text-gray-500 mb-6">
+        <p className="text-center text-gray-600 text-lg mb-8">
           Welcome back! Login to explore delicious recipes.
         </p>
 
-        <form onSubmit={handleLogin} className="space-y-4">
+        <form onSubmit={handleLogin} className="space-y-6">
           <input
             type="email"
             placeholder="Email address"
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-400"
+            className="w-full px-6 py-4 text-lg rounded-xl border border-gray-300 focus:outline-none focus:ring-4 focus:ring-indigo-400"
           />
           <input
             type="password"
@@ -45,23 +49,23 @@ const LoginPage = () => {
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-400"
+            className="w-full px-6 py-4 text-lg rounded-xl border border-gray-300 focus:outline-none focus:ring-4 focus:ring-indigo-400"
           />
           <button
             type="submit"
-            className="w-full py-2 text-white bg-orange-500 hover:bg-orange-600 font-semibold rounded-lg transition"
+            className="w-full py-4 text-lg text-white bg-indigo-500 hover:bg-indigo-600 font-bold rounded-xl transition duration-300"
           >
             🍕 Login
           </button>
         </form>
 
         {message && (
-          <p className="mt-4 text-center text-red-500 font-medium">{message}</p>
+          <p className="mt-6 text-center text-red-500 font-semibold text-lg">{message}</p>
         )}
 
-        <p className="mt-6 text-center text-sm text-gray-600">
+        <p className="mt-8 text-center text-base text-gray-700">
           Don’t have an account?{' '}
-          <a href="/signup" className="text-orange-500 font-medium hover:underline">
+          <a href="/signup" className="text-indigo-500 font-semibold hover:underline">
             Sign up
           </a>
         </p>
