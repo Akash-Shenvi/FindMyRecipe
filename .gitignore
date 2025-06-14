@@ -31,3 +31,7 @@ pnpm-debug.log*
 # local cache
 *.log
 .cache/
+
+.findmyrecipe/
+
+__pycache__/
