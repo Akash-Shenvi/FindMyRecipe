@@ -17,7 +17,7 @@ init_mail(app)
 # def test_mail():
 #     send_email(
 #         subject="Guess Me!",
-#         recipient="rani.kini.17@gmail.com",
+#         recipient="ganpati.shenvi@gmail.com",
 #         body="Testing Email."
 #     )
 #     return "Mail sent!"
