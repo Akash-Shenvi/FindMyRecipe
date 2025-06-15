@@ -8,15 +8,21 @@ const LoginPage = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+
+    if (password.length < 8) {
+      setMessage('❌ Password must be at least 8 characters long.');
+      return;
+    }
+
     try {
       const res = await axios.post('http://localhost:5000/auth/login', {
         email,
         password,
       });
-      setMessage(res.data.success ? 'Login successful!' : 'Invalid credentials');
+      setMessage(res.data.success ? '✅ Login successful!' : '❌ Invalid credentials');
     } catch (err) {
       console.error(err);
-      setMessage('Login failed');
+      setMessage('❌ Login failed. Try again later.');
     }
   };
 
@@ -26,11 +32,11 @@ const LoginPage = () => {
       <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=1470&q=80')] bg-cover bg-center opacity-30 z-0"></div>
 
       {/* Login Card */}
-      <div className="relative z-10 bg-white bg-opacity-90 rounded-2xl shadow-2xl p-12 w-full max-w-xl border-t-8 border-indigo-500">
-        <h1 className="text-4xl font-extrabold text-center text-indigo-600 mb-4">
+      <div className="relative z-10 bg-white bg-opacity-90 rounded-2xl shadow-2xl p-12 w-full max-w-xl border-t-8 border-indigo-500 text-black">
+        <h1 className="text-4xl font-extrabold text-center text-black mb-4">
           🍽️ Find My Recipe
         </h1>
-        <p className="text-center text-gray-600 text-lg mb-8">
+        <p className="text-center text-black text-lg mb-8">
           Welcome back! Login to explore delicious recipes.
         </p>
 
@@ -41,15 +47,15 @@ const LoginPage = () => {
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full px-6 py-4 text-lg rounded-xl border border-gray-300 focus:outline-none focus:ring-4 focus:ring-indigo-400"
+            className="w-full px-6 py-4 text-lg text-black rounded-xl border border-gray-300 focus:outline-none focus:ring-4 focus:ring-indigo-400"
           />
           <input
             type="password"
-            placeholder="Password"
+            placeholder="Password (min 8 characters)"
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full px-6 py-4 text-lg rounded-xl border border-gray-300 focus:outline-none focus:ring-4 focus:ring-indigo-400"
+            className="w-full px-6 py-4 text-lg text-black rounded-xl border border-gray-300 focus:outline-none focus:ring-4 focus:ring-indigo-400"
           />
           <button
             type="submit"
@@ -60,10 +66,10 @@ const LoginPage = () => {
         </form>
 
         {message && (
-          <p className="mt-6 text-center text-red-500 font-semibold text-lg">{message}</p>
+          <p className="mt-6 text-center text-red-600 font-semibold text-lg">{message}</p>
         )}
 
-        <p className="mt-8 text-center text-base text-gray-700">
+        <p className="mt-8 text-center text-base text-black">
           Don’t have an account?{' '}
           <a href="/register" className="text-indigo-500 font-semibold hover:underline">
             Sign up

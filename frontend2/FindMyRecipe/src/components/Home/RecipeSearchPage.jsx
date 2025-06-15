@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const RecipeSearchPage = () => {
   const [query, setQuery] = useState('');
   const [recipes, setRecipes] = useState([]);
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleSearch = async (e) => {
     e.preventDefault();
@@ -19,47 +21,86 @@ const RecipeSearchPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center relative p-6 bg-gray-100">
-      {/* Background */}
-      <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1600891964599-f61ba0e24092?auto=format&fit=crop&w=1470&q=80')] bg-cover bg-center opacity-30 z-0"></div>
+    <div className="min-h-screen bg-white text-black flex flex-col">
+      {/* Header */}
+      <header className="w-full border-b border-gray-200 shadow-sm bg-white sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+          <h1
+            className="text-2xl font-bold text-yellow-500 cursor-pointer"
+            onClick={() => navigate('/')}
+          >
+            🍽️ FindMyRecipe
+          </h1>
+          <nav className="space-x-6 text-md font-medium text-gray-700">
+            <button onClick={() => navigate('/')} className="hover:text-yellow-600">Home</button>
+            <button onClick={() => navigate('/about')} className="hover:text-yellow-600">About Us</button>
+            <button onClick={() => navigate('/contact')} className="hover:text-yellow-600">Contact Us</button>
+           
+          </nav>
+        </div>
+      </header>
 
-      <div className="relative z-10 bg-white bg-opacity-90 rounded-2xl shadow-2xl px-10 py-12 max-w-3xl w-full border-t-8 border-green-500 text-center">
-        <h1 className="text-4xl font-extrabold text-green-600 mb-4">🥗 Recipe Name Finder</h1>
-        <p className="text-gray-700 text-lg mb-6">Enter recipe name (e.g. Butter Chicken)</p>
+      {/* Search Section */}
+      <main className="w-full max-w-5xl mx-auto px-4 py-12">
+        <h2 className="text-4xl font-extrabold text-yellow-600 text-center mb-4">🥗 Search by Recipe Name</h2>
+        <p className="text-lg text-gray-700 text-center mb-8">Enter a recipe name and discover delicious results!</p>
 
-        <form onSubmit={handleSearch} className="flex flex-col md:flex-row gap-4 items-center justify-center mb-6">
+        <form onSubmit={handleSearch} className="flex flex-col md:flex-row gap-4 mb-10 justify-center">
           <input
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search by recipe name..."
-            className="w-full md:w-2/3 px-6 py-3 text-lg rounded-xl border border-gray-300 focus:outline-none focus:ring-4 focus:ring-green-400"
+            placeholder="e.g. Paneer Butter Masala"
+            className="w-full md:w-2/3 px-6 py-3 text-lg border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-yellow-400"
           />
           <button
             type="submit"
-            className="bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-6 rounded-xl text-lg transition duration-300"
+            className="bg-yellow-400 hover:bg-yellow-500 text-black font-semibold px-8 py-3 rounded-full text-lg transition"
           >
             Search
           </button>
         </form>
 
-        {loading && <p className="text-lg text-gray-600">Looking up recipes...</p>}
+        {/* Results */}
+        {loading && (
+          <p className="text-center text-gray-600 text-lg">Searching...</p>
+        )}
 
-        <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-          {recipes.map((recipe) => (
-            <div key={recipe._id} className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-200">
-              <img src={recipe.image_url} alt={recipe.title} className="w-full h-48 object-cover" />
-              <div className="p-4">
-                <h2 className="text-xl font-bold text-green-600 mb-2">{recipe.title}</h2>
-                <p className="text-gray-600 text-sm mb-4">Ingredients: {recipe.ingredients.join(', ')}</p>
-                <a href={`/recipe/${recipe._id}`} className="text-green-500 hover:underline text-sm font-medium">
-                  View Recipe
-                </a>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
+        {!loading && recipes.length === 0 && (
+          <p className="text-center text-gray-600 text-lg">No recipes found. Try something else!</p>
+        )}
+
+        {!loading && recipes.length > 0 && (
+          <div className="space-y-12">
+            {recipes.map((recipe) => (
+              <section key={recipe._id} className="flex flex-col md:flex-row gap-6 border-b pb-6">
+                <img
+                  src={recipe.image_url}
+                  alt={recipe.title}
+                  className="w-full md:w-64 h-48 object-cover rounded-md"
+                />
+                <div className="flex flex-col justify-center">
+                  <h3 className="text-2xl font-bold text-yellow-600">{recipe.title}</h3>
+                  <p className="text-gray-700 mt-2">
+                    <span className="font-medium">Ingredients:</span> {recipe.ingredients.join(', ')}
+                  </p>
+                  <a
+                    href={`/recipe/${recipe._id}`}
+                    className="text-yellow-500 hover:underline font-medium mt-2"
+                  >
+                    View Full Recipe →
+                  </a>
+                </div>
+              </section>
+            ))}
+          </div>
+        )}
+      </main>
+
+      {/* Footer */}
+      <footer className="mt-auto bg-white text-center py-4 text-sm text-gray-600 border-t">
+        &copy; {new Date().getFullYear()} FindMyRecipe. All rights reserved.
+      </footer>
     </div>
   );
 };
