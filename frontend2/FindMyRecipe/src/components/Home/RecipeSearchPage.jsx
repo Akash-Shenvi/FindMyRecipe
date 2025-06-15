@@ -22,26 +22,25 @@ const RecipeSearchPage = () => {
 
   return (
     <div className="min-h-screen bg-white text-black flex flex-col">
-      {/* Header */}
-      <header className="w-full border-b border-gray-200 shadow-sm bg-white sticky top-0 z-50">
+      {/* Navbar at the Top */}
+      <header className="w-full border-b border-gray-800 shadow-sm bg-black sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
           <h1
-            className="text-2xl font-bold text-yellow-500 cursor-pointer"
+            className="text-2xl font-bold text-yellow-400 cursor-pointer"
             onClick={() => navigate('/')}
           >
             🍽️ FindMyRecipe
           </h1>
-          <nav className="space-x-6 text-md font-medium text-gray-700">
-            <button onClick={() => navigate('/')} className="hover:text-yellow-600">Home</button>
-            <button onClick={() => navigate('/about')} className="hover:text-yellow-600">About Us</button>
-            <button onClick={() => navigate('/contact')} className="hover:text-yellow-600">Contact Us</button>
-           
+          <nav className="space-x-6 text-md font-medium text-white">
+            <button onClick={() => navigate('/')} className="hover:text-yellow-400">Home</button>
+            <button onClick={() => navigate('/about')} className="hover:text-yellow-400">About Us</button>
+            <button onClick={() => navigate('/contact')} className="hover:text-yellow-400">Contact Us</button>
           </nav>
         </div>
       </header>
 
-      {/* Search Section */}
-      <main className="w-full max-w-5xl mx-auto px-4 py-12">
+      {/* Main Content */}
+      <main className="flex-grow w-full max-w-5xl mx-auto px-4 py-12">
         <h2 className="text-4xl font-extrabold text-yellow-600 text-center mb-4">🥗 Search by Recipe Name</h2>
         <p className="text-lg text-gray-700 text-center mb-8">Enter a recipe name and discover delicious results!</p>
 
@@ -71,7 +70,7 @@ const RecipeSearchPage = () => {
         )}
 
         {!loading && recipes.length > 0 && (
-          <div className="space-y-12">
+          <div className="space-y-12 pb-24">
             {recipes.map((recipe) => (
               <section key={recipe._id} className="flex flex-col md:flex-row gap-6 border-b pb-6">
                 <img
@@ -97,8 +96,8 @@ const RecipeSearchPage = () => {
         )}
       </main>
 
-      {/* Footer */}
-      <footer className="mt-auto bg-white text-center py-4 text-sm text-gray-600 border-t">
+      {/* Footer Fixed at Bottom */}
+      <footer className="relative z-10 bg-black/40 backdrop-blur-md text-center py-4 text-white text-sm">
         &copy; {new Date().getFullYear()} FindMyRecipe. All rights reserved.
       </footer>
     </div>

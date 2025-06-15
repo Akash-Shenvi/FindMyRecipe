@@ -40,27 +40,26 @@ const UploadRecipePage = () => {
   };
 
   return (
-    <div className="relative min-h-screen bg-gray-100">
+    <div className="relative min-h-screen bg-gray-100 pb-28">
       {/* Navbar */}
-      <header className="w-full border-b border-gray-200 shadow-sm bg-white fixed top-0 z-50">
+      <header className="w-full border-b border-gray-800 shadow-sm bg-black sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
           <h1
-            className="text-2xl font-bold text-yellow-500 cursor-pointer"
+            className="text-2xl font-bold text-yellow-400 cursor-pointer"
             onClick={() => navigate('/')}
           >
             🍽️ FindMyRecipe
           </h1>
-          <nav className="space-x-6 text-md font-medium text-gray-700">
-            <button onClick={() => navigate('/')} className="hover:text-yellow-600">Home</button>
-            <button onClick={() => navigate('/about')} className="hover:text-yellow-600">About Us</button>
-            <button onClick={() => navigate('/contact')} className="hover:text-yellow-600">Contact Us</button>
-      
+          <nav className="space-x-6 text-md font-medium text-white">
+            <button onClick={() => navigate('/')} className="hover:text-yellow-400">Home</button>
+            <button onClick={() => navigate('/about')} className="hover:text-yellow-400">About Us</button>
+            <button onClick={() => navigate('/contact')} className="hover:text-yellow-400">Contact Us</button>
           </nav>
         </div>
       </header>
 
       {/* Content */}
-      <div className="pt-28 pb-24 flex flex-col items-center justify-center relative px-6">
+      <div className="pt-28 flex flex-col items-center justify-center relative px-6">
         <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1470&q=80')] bg-cover bg-center opacity-30 z-0"></div>
 
         <div className="relative z-10 bg-white bg-opacity-90 rounded-2xl shadow-2xl px-10 py-12 max-w-3xl w-full border-t-8 border-yellow-500 text-center">
@@ -129,9 +128,9 @@ const UploadRecipePage = () => {
       </div>
 
       {/* Footer */}
-      <footer className="w-full bg-white border-t border-gray-200 py-4 px-6 text-center text-sm text-gray-600 fixed bottom-0 z-40">
-        &copy; {new Date().getFullYear()} FindMyRecipe. All rights reserved.
-      </footer>
+      <footer className="fixed bottom-0 w-full z-50 bg-black/40 backdrop-blur-md text-center py-4 text-white text-sm">
+  &copy; {new Date().getFullYear()} FindMyRecipe. All rights reserved.
+</footer>
     </div>
   );
 };

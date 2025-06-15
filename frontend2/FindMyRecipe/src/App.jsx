@@ -8,6 +8,7 @@ import RecipeSearchPage from "./components/Home/RecipeSearchPage";
 import UploadRecipePage from "./components/Home/UploadRecipePage";
 import Navbar from './components/Home/Navbar';
 import ProfilePage from './components/Home/ProfilePage';
+import ForgotPassword from "./components/Auth/ForgotPassword";
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
       <Route path="/upload" element={<UploadRecipePage />} />
       <Route path="/profile" element={<ProfilePage />} />
       <Route path="/profile" element={<ProfilePage />} />
+      <Route path="/forgot" element={<ForgotPassword />} />
     </Routes>
   );
 }

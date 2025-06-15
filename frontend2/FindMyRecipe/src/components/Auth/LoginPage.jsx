@@ -57,6 +57,13 @@ const LoginPage = () => {
             onChange={(e) => setPassword(e.target.value)}
             className="w-full px-6 py-4 text-lg text-black rounded-xl border border-gray-300 focus:outline-none focus:ring-4 focus:ring-indigo-400"
           />
+
+          <div className="text-right text-sm">
+            <a href="/forgot" className="text-indigo-500 hover:underline">
+              Forgot Password?
+            </a>
+          </div>
+
           <button
             type="submit"
             className="w-full py-4 text-lg text-white bg-indigo-500 hover:bg-indigo-600 font-bold rounded-xl transition duration-300"

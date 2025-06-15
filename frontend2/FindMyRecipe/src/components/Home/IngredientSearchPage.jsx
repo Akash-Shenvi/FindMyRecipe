@@ -30,32 +30,31 @@ const IngredientSearchPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white font-serif text-gray-800 flex flex-col items-center">
-      {/* Navigation Bar */}
-      <header className="w-full border-b border-gray-200 shadow-sm bg-white sticky top-0 z-50">
+    <div className="min-h-screen bg-white font-serif text-gray-800 flex flex-col items-center pb-24">
+      {/* Top Navbar/Header */}
+      <header className="w-full border-b border-gray-800 shadow-sm bg-black sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
           <h1
-            className="text-2xl font-bold text-yellow-500 cursor-pointer"
+            className="text-2xl font-bold text-yellow-400 cursor-pointer"
             onClick={() => navigate('/')}
           >
             🍽️ FindMyRecipe
           </h1>
-          <nav className="space-x-6 text-md font-medium text-gray-700">
-            <button onClick={() => navigate('/')} className="hover:text-yellow-600">Home</button>
-            <button onClick={() => navigate('/about')} className="hover:text-yellow-600">About Us</button>
-            <button onClick={() => navigate('/contact')} className="hover:text-yellow-600">Contact Us</button>
+          <nav className="space-x-6 text-md font-medium text-white">
+            <button onClick={() => navigate('/')} className="hover:text-yellow-400">Home</button>
+            <button onClick={() => navigate('/about')} className="hover:text-yellow-400">About Us</button>
+            <button onClick={() => navigate('/contact')} className="hover:text-yellow-400">Contact Us</button>
           </nav>
         </div>
       </header>
 
-      {/* Header Section */}
+      {/* Page Title */}
       <div className="w-full border-b shadow-sm py-6 px-4 flex items-center justify-center">
         <h1 className="text-3xl md:text-4xl font-bold text-yellow-600 flex items-center gap-2">
           🥕 Search by Ingredients
         </h1>
       </div>
 
-      {/* Subtext */}
       <p className="mt-3 text-center text-gray-600 text-lg">
         Enter ingredients and discover delicious results!
       </p>
@@ -88,7 +87,6 @@ const IngredientSearchPage = () => {
       {loading && (
         <p className="text-lg mt-10 text-gray-500">Searching for tasty recipes...</p>
       )}
-
       {!loading && recipes.length === 0 && (
         <p className="text-lg mt-10 text-gray-500">No recipes found. Try different ingredients!</p>
       )}
@@ -126,10 +124,10 @@ const IngredientSearchPage = () => {
         </div>
       )}
 
-      {/* Footer */}
-      <footer className="w-full text-center border-t mt-auto py-4 text-sm text-gray-500">
-        © {new Date().getFullYear()} FindMyRecipe. All rights reserved.
-      </footer>
+      {/* Fixed Footer */}
+      <footer className="fixed bottom-0 w-full z-50 bg-black/40 backdrop-blur-md text-center py-4 text-white text-sm">
+  &copy; {new Date().getFullYear()} FindMyRecipe. All rights reserved.
+</footer>
     </div>
   );
 };

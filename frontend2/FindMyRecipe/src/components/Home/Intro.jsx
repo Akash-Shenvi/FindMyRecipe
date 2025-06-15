@@ -22,7 +22,7 @@ const HomePage = () => {
 
       {/* Main Content */}
       <main className="relative z-10 flex-grow flex items-center justify-center px-6 text-center">
-        <div className="bg-white/90 text-black rounded-2xl shadow-2xl px-10 py-14 max-w-3xl w-full border-t-8 border-yellow-400">
+        <div className="bg-white/90 text-black rounded-2xl shadow-2xl px-16 py-14 max-w-5xl w-full border-t-8 border-yellow-400">
           <h2 className="text-5xl font-extrabold text-yellow-500 mb-4">
             🧑‍🍳 Welcome to Find My Recipe
           </h2>
