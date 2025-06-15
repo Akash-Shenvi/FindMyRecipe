@@ -9,7 +9,7 @@ const LoginPage = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post('http://localhost:5000/api/login', {
+      const res = await axios.post('http://localhost:5000/auth/login', {
         email,
         password,
       });
@@ -65,7 +65,7 @@ const LoginPage = () => {
 
         <p className="mt-8 text-center text-base text-gray-700">
           Don’t have an account?{' '}
-          <a href="/signup" className="text-indigo-500 font-semibold hover:underline">
+          <a href="/register" className="text-indigo-500 font-semibold hover:underline">
             Sign up
           </a>
         </p>
