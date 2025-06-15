@@ -1,0 +1,8 @@
+react
+react-dom
+react-router-dom
+axios
+react-tag-input-component
+tailwindcss
+postcss
+autoprefixer
