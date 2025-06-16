@@ -19,7 +19,14 @@ const LoginPage = () => {
         email,
         password,
       });
-      setMessage(res.data.success ? '✅ Login successful!' : '❌ Invalid credentials');
+    
+      if (res.data.success) {
+        const token = res.data.token;
+        localStorage.setItem('token', token);  // ✅ Store token
+        setMessage('✅ Login successful!');
+      } else {
+        setMessage('❌ Invalid credentials');
+      }
     } catch (err) {
       console.error(err);
       setMessage('❌ Login failed. Try again later.');
