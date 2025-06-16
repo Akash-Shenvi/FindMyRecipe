@@ -10,8 +10,8 @@ const ForgotPassword = () => {
 
   const sendOtp = async () => {
     try {
-      const res = await axios.post('http://localhost:5000/auth/forgot-password/send-otp', {
-        identifier: emailOrMobile,
+      const res = await axios.post('http://localhost:5000/auth/send-email-otp-forgotpassword', {
+        email: emailOrMobile,
       });
 
       if (res.data.success) {

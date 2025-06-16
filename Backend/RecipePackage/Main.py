@@ -3,10 +3,18 @@ from flask_cors import CORS
 from RecipePackage.Auth.auth import authp
 from RecipePackage.Models import config
 from RecipePackage.Mail.mailsender import init_mail, send_email
+from RecipePackage.Models.models import db
+from RecipePackage.Models.config import apply_config
+
+
 app = Flask(__name__)
+
+apply_config(app)
+db.init_app(app)
 CORS(app)
 
-
+with app.app_context():
+    db.create_all()
 
 app.config.from_object(config)
 
