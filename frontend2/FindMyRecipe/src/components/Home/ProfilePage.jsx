@@ -1,21 +1,43 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import defaultProfileImage from '../../assets/profile.png';
 
 const ProfilePage = () => {
   const navigate = useNavigate();
+  const token = localStorage.getItem('token');
 
   const [isEditing, setIsEditing] = useState(false);
-  const [profile, setProfile] = useState({
-    name: 'Rani Kini',
-    phone: '+91 98765 43210',
-    email: 'rani@example.com',
-    age: 22,
-    bio: 'Passionate about food and flavor. Exploring the world one recipe at a time!',
-    image: defaultProfileImage,
+  const [profile, setProfile] = useState(null);
+  const [editedProfile, setEditedProfile] = useState({});
+  const [selectedImageFile, setSelectedImageFile] = useState(null);
+  const [message, setMessage] = useState('');
+
+  const axiosAuth = axios.create({
+    baseURL: 'http://localhost:5000',
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
   });
 
-  const [editedProfile, setEditedProfile] = useState(profile);
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const res = await axiosAuth.get('/auth/whoami');
+        if (res.data.success) {
+          setProfile(res.data.user);
+          setEditedProfile(res.data.user);
+        } else {
+          setMessage('❌ Failed to load profile');
+        }
+      } catch (err) {
+        console.error(err);
+        setMessage('❌ Error fetching profile');
+      }
+    };
+
+    fetchProfile();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -26,19 +48,58 @@ const ProfilePage = () => {
     const file = e.target.files[0];
     if (file) {
       const imageURL = URL.createObjectURL(file);
+      setSelectedImageFile(file);
       setEditedProfile({ ...editedProfile, image: imageURL });
     }
   };
 
-  const handleSave = () => {
-    setProfile(editedProfile);
-    setIsEditing(false);
+  const handleSave = async () => {
+    try {
+      const formData = new FormData();
+      formData.append('name', editedProfile.name);
+      formData.append('email', editedProfile.email);
+      formData.append('phone', editedProfile.phone);
+      formData.append('age', editedProfile.age);
+      formData.append('bio', editedProfile.bio);
+      if (selectedImageFile) {
+        formData.append('image', selectedImageFile);
+      }
+
+      const res = await axios.put('http://localhost:5000/auth/update-profile', formData, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+
+      if (res.data.success) {
+        setProfile(res.data.user);
+        setIsEditing(false);
+        setMessage('✅ Profile updated!');
+        setSelectedImageFile(null);
+      } else {
+        setMessage('❌ Update failed');
+      }
+    } catch (err) {
+      console.error(err);
+      setMessage('❌ Error updating profile');
+    }
   };
 
   const handleCancel = () => {
     setEditedProfile(profile);
     setIsEditing(false);
+    setSelectedImageFile(null);
+    setMessage('');
   };
+
+  if (!profile) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-lg font-semibold">Loading profile...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen w-full bg-yellow-50 flex flex-col items-center justify-center px-6 py-10 text-gray-800">
@@ -54,7 +115,7 @@ const ProfilePage = () => {
       <div className="bg-white w-full max-w-2xl rounded-2xl shadow-2xl p-10 border-t-8 border-yellow-400 text-center">
         <div className="relative w-32 h-32 mx-auto mb-6">
           <img
-            src={editedProfile.image}
+            src={editedProfile.image || defaultProfileImage}
             alt="Profile"
             className="w-32 h-32 rounded-full border-4 border-yellow-400 object-cover"
           />
@@ -135,6 +196,10 @@ const ProfilePage = () => {
             </button>
           )}
         </div>
+
+        {message && (
+          <p className="mt-6 text-center text-red-600 font-semibold text-lg">{message}</p>
+        )}
       </div>
     </div>
   );

@@ -1,5 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
-
+from sqlalchemy.dialects.mysql import LONGBLOB
 db = SQLAlchemy()
 
 class User(db.Model):
@@ -12,6 +12,7 @@ class User(db.Model):
     phone = db.Column(db.String(15), unique=True, nullable=True)
     age = db.Column(db.Integer)
     bio = db.Column(db.String(500))
+    image = db.Column(LONGBLOB)
 
     # def __repr__(self):
         # return f"<User {self.email}>"

@@ -8,6 +8,7 @@ from RecipePackage.Mail.mailsender import send_email
 from RecipePackage.Models.models import User,db
 from werkzeug.security import generate_password_hash,check_password_hash
 from flask_jwt_extended import jwt_required, get_jwt_identity
+import base64
 
 authp = Blueprint('auth', __name__)
 
@@ -21,6 +22,7 @@ def otpgen():
 
 
  
+
 
 
 
@@ -218,12 +220,47 @@ def index():
 
 
 #Testing Point
+
+
 @authp.route('/whoami', methods=['GET'])
 @jwt_required()
-
 def whoami():
-    user_id = int(get_jwt_identity())  # Cast back to int
+    user_id = get_jwt_identity()
     user = User.query.get(user_id)
     if not user:
         return jsonify({'success': False, 'message': 'User not found'}), 404
-    return jsonify({'success': True, 'name': user.name}), 200
+
+    # Convert image BLOB to base64 string
+    image_base64 = base64.b64encode(user.image).decode('utf-8') if user.image else None
+
+    return jsonify({
+        'success': True,
+        'user': {
+            'name': user.name,
+            'email': user.email,
+            'phone': user.phone,
+            'age': user.age,
+            'bio': user.bio,
+            'image': f"data:image/png;base64,{image_base64}" if image_base64 else None
+        }
+    }), 200
+    
+@authp.route('/update-profile', methods=['PUT'])
+@jwt_required()
+def update_profile():
+    user_id = get_jwt_identity()
+    user = User.query.get(user_id)
+
+    user.name = request.form.get('name')
+    user.email = request.form.get('email')
+    user.phone = request.form.get('phone')
+    user.age = request.form.get('age')
+    user.bio = request.form.get('bio')
+
+    if 'image' in request.files:
+        image_file = request.files['image']
+        user.image = image_file.read()
+        # user.image_mimetype = image_file.mimetype  # Optional but useful
+
+    db.session.commit()
+    return jsonify({'success':True}), 200
