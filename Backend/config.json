@@ -11,6 +11,10 @@
       "smtp_port": 587,
       "sender_email": "accmovie906@gmail.com",
       "sender_password": "fgggjnymlocyvjru"
+    },
+    "oauth":{
+      "client_id":"509951524671-ejq62rju6jg90smol91cltcbsu511b95.apps.googleusercontent.com",
+      "client_secret":"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"
     }
   }
   
