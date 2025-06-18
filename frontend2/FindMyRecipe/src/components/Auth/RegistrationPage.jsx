@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const RegisterPage = () => {
   const [name, setName] = useState('');
@@ -8,9 +9,12 @@ const RegisterPage = () => {
   const [otp, setOtp] = useState('');
   const [otpSent, setOtpSent] = useState(false);
   const [message, setMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(false); // ✅ Loading state
+
+  const navigate = useNavigate();
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\w\s]).{8,}$/;
+  const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\w\s]).{8}$/;
 
   const sendOtp = async () => {
     if (!name || !email || !password) {
@@ -28,6 +32,7 @@ const RegisterPage = () => {
       return;
     }
 
+    setIsLoading(true);
     try {
       const res = await axios.post('http://localhost:5000/auth/send-email-otp-register', { email });
       if (res.data.success) {
@@ -39,6 +44,7 @@ const RegisterPage = () => {
     } catch (err) {
       setMessage('❌ Error sending OTP.');
     }
+    setIsLoading(false);
   };
 
   const verifyAndRegister = async () => {
@@ -47,6 +53,7 @@ const RegisterPage = () => {
       return;
     }
 
+    setIsLoading(true);
     try {
       const res = await axios.post('http://localhost:5000/auth/register', {
         name,
@@ -57,12 +64,16 @@ const RegisterPage = () => {
 
       if (res.data.success) {
         setMessage('✅ Registration successful!');
+        setTimeout(() => {
+          navigate('/login');
+        }, 2000);
       } else {
         setMessage('❌ OTP verification failed.');
       }
     } catch (err) {
       setMessage('❌ Verification failed. Try again later.');
     }
+    setIsLoading(false);
   };
 
   return (
@@ -104,9 +115,12 @@ const RegisterPage = () => {
             <button
               type="button"
               onClick={sendOtp}
-              className="w-full py-4 bg-yellow-400 hover:bg-yellow-500 text-black font-bold rounded-xl transition duration-300"
+              disabled={isLoading}
+              className={`w-full py-4 ${
+                isLoading ? 'bg-gray-400 cursor-not-allowed' : 'bg-yellow-400 hover:bg-yellow-500'
+              } text-black font-bold rounded-xl transition duration-300`}
             >
-              📤 Send OTP
+              {isLoading ? 'Sending OTP...' : '📤 Send OTP'}
             </button>
           ) : (
             <>
@@ -121,9 +135,12 @@ const RegisterPage = () => {
               <button
                 type="button"
                 onClick={verifyAndRegister}
-                className="w-full py-4 bg-indigo-500 hover:bg-indigo-600 text-white font-bold rounded-xl transition duration-300"
+                disabled={isLoading}
+                className={`w-full py-4 ${
+                  isLoading ? 'bg-gray-500 cursor-not-allowed' : 'bg-indigo-500 hover:bg-indigo-600'
+                } text-white font-bold rounded-xl transition duration-300`}
               >
-                ✅ Verify OTP & Register
+                {isLoading ? 'Verifying...' : '✅ Verify OTP & Register'}
               </button>
             </>
           )}

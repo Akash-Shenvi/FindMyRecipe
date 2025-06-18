@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const ForgotPassword = () => {
   const [step, setStep] = useState(1); // 1: send OTP, 2: verify OTP, 3: reset password

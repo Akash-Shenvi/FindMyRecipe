@@ -13,9 +13,9 @@ import ForgotPassword from "./components/Auth/ForgotPassword";
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<Intro />} />
+      <Route path="/" element={<RegistrationPage />} />
       <Route path="/login" element={<LoginPage />} />
-      <Route path="/register" element={<RegistrationPage />} />
+      <Route path="/home" element={<Intro />} />
       <Route path="/ingredients" element={<IngredientSearchPage />} />
       <Route path="/search" element={<RecipeSearchPage />} />
       <Route path="/upload" element={<UploadRecipePage />} />

@@ -54,38 +54,52 @@ const ProfilePage = () => {
   };
 
   const handleSave = async () => {
-    try {
-      const formData = new FormData();
-      formData.append('name', editedProfile.name);
-      formData.append('email', editedProfile.email);
-      formData.append('phone', editedProfile.phone);
-      formData.append('age', editedProfile.age);
-      formData.append('bio', editedProfile.bio);
-      if (selectedImageFile) {
-        formData.append('image', selectedImageFile);
-      }
-
-      const res = await axios.put('http://localhost:5000/auth/update-profile', formData, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'multipart/form-data'
-        }
-      });
-
-      if (res.data.success) {
-        setProfile(res.data.user);
-        setIsEditing(false);
-        setMessage('✅ Profile updated!');
-        setSelectedImageFile(null);
-      } else {
-        setMessage('❌ Update failed');
-      }
-    } catch (err) {
-      console.error(err);
-      setMessage('❌ Error updating profile');
+  try {
+    const formData = new FormData();
+    formData.append('name', editedProfile.name);
+    formData.append('email', editedProfile.email);
+    formData.append('phone', editedProfile.phone);
+    formData.append('age', editedProfile.age);
+    formData.append('bio', editedProfile.bio);
+    if (selectedImageFile) {
+      formData.append('image', selectedImageFile);
     }
-  };
 
+    const res = await axios.put('http://localhost:5000/auth/update-profile', formData, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+
+    if (res.data && res.data.success && res.data.user) {
+  const updatedUser = res.data.user;
+
+  setProfile(updatedUser);
+  setEditedProfile(updatedUser);
+  setIsEditing(false);
+  setMessage('✅ Profile updated!');
+  setSelectedImageFile(null);
+
+  // ✅ Save updated info to localStorage
+  const imagePath = updatedUser.image;
+  const fullImageUrl = imagePath?.startsWith('http')
+    ? imagePath
+    : `http://localhost:5000/${imagePath}`;
+  localStorage.setItem('profileImage', fullImageUrl);
+  localStorage.setItem('profileName', updatedUser.name);
+  localStorage.setItem('profileEmail', updatedUser.email);
+
+  // ✅ Dispatch custom event for Navbar
+  window.dispatchEvent(new Event('profileUpdated'));
+    } else {
+      setMessage('❌ Update failed: Invalid response');
+    }
+  } catch (err) {
+    console.error(err);
+    setMessage('❌ Error updating profile');
+  }
+};
   const handleCancel = () => {
     setEditedProfile(profile);
     setIsEditing(false);
