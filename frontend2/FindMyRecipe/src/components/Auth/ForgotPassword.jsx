@@ -3,13 +3,15 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 const ForgotPassword = () => {
-  const [step, setStep] = useState(1); // 1: send OTP, 2: verify OTP, 3: reset password
+  const [step, setStep] = useState(1);
   const [emailOrMobile, setEmailOrMobile] = useState('');
   const [otp, setOtp] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [message, setMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(false); // ✅ Common loading state
 
   const sendOtp = async () => {
+    setIsLoading(true);
     try {
       const res = await axios.post('http://localhost:5000/auth/send-email-otp-forgotpassword', {
         email: emailOrMobile,
@@ -25,9 +27,11 @@ const ForgotPassword = () => {
       console.error(err);
       setMessage('❌ Error sending OTP');
     }
+    setIsLoading(false);
   };
 
   const verifyOtp = async () => {
+    setIsLoading(true);
     try {
       const res = await axios.post('http://localhost:5000/auth/forgot-password/verify-otp', {
         identifier: emailOrMobile,
@@ -43,9 +47,11 @@ const ForgotPassword = () => {
     } catch (err) {
       setMessage('❌ OTP verification failed');
     }
+    setIsLoading(false);
   };
 
   const resetPassword = async () => {
+    setIsLoading(true);
     try {
       const res = await axios.post('http://localhost:5000/auth/forgot-password/reset', {
         identifier: emailOrMobile,
@@ -64,6 +70,7 @@ const ForgotPassword = () => {
     } catch (err) {
       setMessage('❌ Error resetting password');
     }
+    setIsLoading(false);
   };
 
   return (
@@ -82,9 +89,14 @@ const ForgotPassword = () => {
             />
             <button
               onClick={sendOtp}
-              className="w-full py-3 bg-indigo-500 text-white font-bold rounded-xl hover:bg-indigo-600 transition duration-300"
+              disabled={isLoading}
+              className={`w-full py-3 font-bold rounded-xl transition duration-300 ${
+                isLoading
+                  ? 'bg-gray-400 cursor-not-allowed text-white'
+                  : 'bg-indigo-500 hover:bg-indigo-600 text-white'
+              }`}
             >
-              📤 Send OTP
+              {isLoading ? '📤 Sending OTP...' : '📤 Send OTP'}
             </button>
           </>
         )}
@@ -100,9 +112,14 @@ const ForgotPassword = () => {
             />
             <button
               onClick={verifyOtp}
-              className="w-full py-3 bg-indigo-500 text-white font-bold rounded-xl hover:bg-indigo-600 transition duration-300"
+              disabled={isLoading}
+              className={`w-full py-3 font-bold rounded-xl transition duration-300 ${
+                isLoading
+                  ? 'bg-gray-400 cursor-not-allowed text-white'
+                  : 'bg-indigo-500 hover:bg-indigo-600 text-white'
+              }`}
             >
-              ✅ Verify OTP
+              {isLoading ? '✅ Verifying...' : '✅ Verify OTP'}
             </button>
           </>
         )}
@@ -118,9 +135,14 @@ const ForgotPassword = () => {
             />
             <button
               onClick={resetPassword}
-              className="w-full py-3 bg-green-500 text-white font-bold rounded-xl hover:bg-green-600 transition duration-300"
+              disabled={isLoading}
+              className={`w-full py-3 font-bold rounded-xl transition duration-300 ${
+                isLoading
+                  ? 'bg-gray-400 cursor-not-allowed text-white'
+                  : 'bg-green-500 hover:bg-green-600 text-white'
+              }`}
             >
-              🔁 Reset Password
+              {isLoading ? '🔁 Resetting...' : '🔁 Reset Password'}
             </button>
           </>
         )}

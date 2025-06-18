@@ -1,7 +1,7 @@
 from flask import Flask
 from flask_cors import CORS
 import os,json,datetime
-from RecipePackage.auth.auth import authp
+from RecipePackage.Auth.auth import authp
 from RecipePackage.Models import config
 from RecipePackage.Mail.mailsender import init_mail, send_email
 from RecipePackage.Models.models import db

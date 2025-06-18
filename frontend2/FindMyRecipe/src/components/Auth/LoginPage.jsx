@@ -55,6 +55,9 @@ const LoginPage = () => {
         setMessage('✅ ' + message);
         popup?.close();
         window.removeEventListener('message', listener);
+        setTimeout(() => {
+          navigate('/home');
+        }, 2000);
       }
     };
 

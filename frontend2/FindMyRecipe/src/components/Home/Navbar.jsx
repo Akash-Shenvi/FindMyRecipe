@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import defaultProfileImage from '../../assets/profile.png';
+import axios from 'axios';
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -9,42 +10,46 @@ const Navbar = () => {
   const [userInfo, setUserInfo] = useState({ name: 'User', email: 'user@example.com' });
   const dropdownRef = useRef();
 
-  // Close dropdown when clicked outside
+  // Close dropdown if clicked outside
   const handleOutsideClick = (e) => {
     if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
       setShowDropdown(false);
     }
   };
 
-  // Fetch profile data from localStorage
-  const fetchProfileData = () => {
-    const storedImage = localStorage.getItem('profileImage');
-    if (storedImage?.startsWith('data:image')) {
-  // It's base64 (from DB)
-  setProfileImg(storedImage);
-} else if (storedImage && storedImage !== 'null' && storedImage !== 'undefined') {
-  // It's relative path (from file system)
-  setProfileImg(`http://localhost:5000/${storedImage}`);
-} else {
-  // No image
-  setProfileImg(defaultProfileImage);
-}
+  // Fetch user info from backend
+  const fetchUserInfo = async () => {
+    try {
+      const token = localStorage.getItem('token'); // or however you're storing it
+      const res = await axios.get('http://localhost:5000/auth/whoami', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-    const name = localStorage.getItem('profileName') || 'User';
-    const email = localStorage.getItem('profileEmail') || 'user@example.com';
-    setUserInfo({ name, email });
+      if (res.data && res.data.user) {
+        const { name, email, image } = res.data.user;
+        setUserInfo({ name, email });
+
+        if (image?.startsWith('data:image')) {
+          setProfileImg(image);
+        } else if (image) {
+          setProfileImg(`http://localhost:5000/${image}`);
+        } else {
+          setProfileImg(defaultProfileImage);
+        }
+      }
+    } catch (error) {
+      console.error("❌ Failed to fetch user info:", error);
+      // Optionally redirect to login or logout
+    }
   };
 
   useEffect(() => {
     document.addEventListener('mousedown', handleOutsideClick);
-    fetchProfileData();
-
-    // 🔄 Listen for profile update event
-    window.addEventListener('profileUpdated', fetchProfileData);
-
+    fetchUserInfo();
     return () => {
       document.removeEventListener('mousedown', handleOutsideClick);
-      window.removeEventListener('profileUpdated', fetchProfileData);
     };
   }, []);
 
@@ -102,7 +107,7 @@ const Navbar = () => {
                   </button>
                   <button
                     onClick={() => {
-                      localStorage.clear();
+                      localStorage.removeItem('token');
                       navigate('/');
                     }}
                     className="w-full text-left text-sm text-red-600 hover:bg-red-50 px-3 py-2 rounded-md"
