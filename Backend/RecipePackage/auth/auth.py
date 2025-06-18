@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request,url_for
 import random
 from flask_jwt_extended import create_access_token
 import os
@@ -9,6 +9,11 @@ from RecipePackage.Models.models import User,db
 from werkzeug.security import generate_password_hash,check_password_hash
 from flask_jwt_extended import jwt_required, get_jwt_identity
 import base64
+from RecipePackage.oauth import oauth
+
+
+
+
 
 authp = Blueprint('auth', __name__)
 
@@ -264,3 +269,45 @@ def update_profile():
 
     db.session.commit()
     return jsonify({'success':True}), 200
+
+
+
+
+@authp.route('/google-login',methods=['Get'])
+def google_login():
+    google = oauth.create_client('google')
+    redirect_uri = url_for('auth.google_callback', _external=True)
+    return google.authorize_redirect(redirect_uri)
+
+@authp.route('/google/callback')
+def google_callback():
+    google = oauth.create_client('google')
+    token = google.authorize_access_token()
+    resp = google.get('userinfo')
+    user_info = resp.json()
+
+    # Optional: store user if new
+    email = user_info.get('email')
+    name = user_info.get('name')
+    print(email,name)
+
+    if not email:
+        return jsonify({'success': False, 'message': 'Google account did not return email'}), 400
+
+    user = User.query.filter_by(email=email).first()
+    dummy_password = generate_password_hash('oauth-google-account')
+    if not user:
+        user = User(name=name, email=email, password=dummy_password)  # No password
+        db.session.add(user)
+        db.session.commit()
+
+    access_token = create_access_token(identity=str(user.id))
+    return f"""
+<script>
+  window.opener.postMessage({{
+    token: "{access_token}",
+    message: "Login with Google successful"
+  }}, "http://localhost:5173");
+  window.close();
+</script>
+"""

@@ -8,14 +8,19 @@ from RecipePackage.Models.models import db
 from RecipePackage.Models.config import apply_config
 from flask_migrate import Migrate
 from flask_jwt_extended import JWTManager
-
-
+from authlib.integrations.flask_client import OAuth
+from RecipePackage.oauth import oauth, configure_oauth
 app = Flask(__name__)
+configure_oauth(app)
 with open(os.path.join(os.path.dirname(__file__), '../config.json')) as f:
     config_data = json.load(f)
 SECRET_KEY = config_data['secret_key']
 
 print(SECRET_KEY)
+
+
+
+
 
 
 
@@ -34,7 +39,12 @@ with app.app_context():
 app.config.from_object(config)
 
 app.register_blueprint(authp, url_prefix='/auth')
+
 init_mail(app)
+
+
+
+
 
 # @app.route("/send-mail")
 # def test_mail():

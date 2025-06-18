@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
 const LoginPage = () => {
@@ -19,10 +19,10 @@ const LoginPage = () => {
         email,
         password,
       });
-    
+
       if (res.data.success) {
         const token = res.data.token;
-        localStorage.setItem('token', token);  // ✅ Store token
+        localStorage.setItem('token', token);
         setMessage('✅ Login successful!');
       } else {
         setMessage('❌ Invalid credentials');
@@ -31,6 +31,28 @@ const LoginPage = () => {
       console.error(err);
       setMessage('❌ Login failed. Try again later.');
     }
+  };
+
+  const handleGoogleLogin = () => {
+    const popup = window.open(
+      'http://localhost:5000/auth/google-login',
+      'googleLogin',
+      'width=500,height=600'
+    );
+
+    const listener = (event) => {
+      if (event.origin !== 'http://localhost:5000') return;
+
+      const { token, message } = event.data;
+      if (token) {
+        localStorage.setItem('token', token);
+        setMessage('✅ ' + message);
+        popup?.close();
+        window.removeEventListener('message', listener);
+      }
+    };
+
+    window.addEventListener('message', listener);
   };
 
   return (
@@ -78,6 +100,21 @@ const LoginPage = () => {
             🍕 Login
           </button>
         </form>
+
+        {/* Google Login Button */}
+        <div className="mt-6">
+          <button
+            onClick={handleGoogleLogin}
+            className="w-full py-3 text-lg text-black bg-white border border-gray-300 hover:bg-gray-100 font-semibold rounded-xl transition duration-300 flex items-center justify-center"
+          >
+            <img
+              src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+              alt="Google"
+              className="h-6 w-6 mr-3"
+            />
+            Continue with Google
+          </button>
+        </div>
 
         {message && (
           <p className="mt-6 text-center text-red-600 font-semibold text-lg">{message}</p>
