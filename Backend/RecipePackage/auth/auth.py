@@ -265,10 +265,21 @@ def update_profile():
     if 'image' in request.files:
         image_file = request.files['image']
         user.image = image_file.read()
-        # user.image_mimetype = image_file.mimetype  # Optional but useful
 
     db.session.commit()
-    return jsonify({'success':True}), 200
+
+    # Create a serializable user dictionary
+    user_data = {
+        'id': user.id,
+        'name': user.name,
+        'email': user.email,
+        'phone': user.phone,
+        'age': user.age,
+        'bio': user.bio,
+        'image': f"user_images/{user.id}.png" if user.image else None,  # Update this based on how you serve images
+    }
+
+    return jsonify({'success': True, 'user': user_data}), 200
 
 
 

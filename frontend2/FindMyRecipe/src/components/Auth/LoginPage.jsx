@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
+  const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -24,6 +26,10 @@ const LoginPage = () => {
         const token = res.data.token;
         localStorage.setItem('token', token);
         setMessage('✅ Login successful!');
+        setTimeout(() => {
+          navigate('/home');
+        }, 2000);
+
       } else {
         setMessage('❌ Invalid credentials');
       }
