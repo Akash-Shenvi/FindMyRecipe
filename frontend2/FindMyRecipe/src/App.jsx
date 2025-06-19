@@ -10,6 +10,7 @@ import Navbar from './components/Home/Navbar';
 import ProfilePage from './components/Home/ProfilePage';
 import ForgotPassword from "./components/Auth/ForgotPassword";
 import  Recipefind  from "./components/Test/Recipefind";
+import RecipeView from "./components/Test/RecipeViewPage";
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
       <Route path="/profile" element={<ProfilePage />} />
       <Route path="/forgot" element={<ForgotPassword />} />
       <Route path="/Recipefind" element={<Recipefind/>}/>
+      <Route path="/recipe/:name" element={<RecipeView />} />
     </Routes>
   );
 }
