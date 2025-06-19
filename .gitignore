@@ -32,7 +32,7 @@ pnpm-debug.log*
 *.log
 .cache/
 
-findmyrecipe/
 
 __pycache__/
 migrations/
+

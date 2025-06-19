@@ -9,6 +9,7 @@ import UploadRecipePage from "./components/Home/UploadRecipePage";
 import Navbar from './components/Home/Navbar';
 import ProfilePage from './components/Home/ProfilePage';
 import ForgotPassword from "./components/Auth/ForgotPassword";
+import  Recipefind  from "./components/Test/Recipefind";
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
       <Route path="/profile" element={<ProfilePage />} />
       <Route path="/profile" element={<ProfilePage />} />
       <Route path="/forgot" element={<ForgotPassword />} />
+      <Route path="/Recipefind" element={<Recipefind/>}/>
     </Routes>
   );
 }
