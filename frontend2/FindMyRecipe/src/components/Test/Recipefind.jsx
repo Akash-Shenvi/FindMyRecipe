@@ -1,47 +1,161 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
-const CATEGORY_ENDPOINTS = {
-  cuisines: '/cuisines',
-  courses: '/courses',
-  diets: '/diets',
+const FILTER_CATEGORIES = {
+  cuisine: '/cuisines',
+  course: '/courses',
+  diet: '/diets',
 };
 
 const Recipefind = () => {
-  const [selectedCategory, setSelectedCategory] = useState(null);
-  const [items, setItems] = useState([]);
-  const [search, setSearch] = useState('');
+  const [filters, setFilters] = useState({ cuisine: null, course: null, diet: null });
+  const [options, setOptions] = useState({ cuisine: [], course: [], diet: [] });
+  const [searchInputs, setSearchInputs] = useState({ cuisine: '', course: '', diet: '' });
+  const [openFilter, setOpenFilter] = useState(null);
+  const [recipes, setRecipes] = useState([]);
+  const [recipeSearch, setRecipeSearch] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const popupRef = useRef();
 
-  const fetchCategoryItems = async (category) => {
-    setSelectedCategory(category);
-    setLoading(true);
-    setSearch('');
-    try {
-      const res = await axios.get(`http://localhost:5001${CATEGORY_ENDPOINTS[category]}`);
-      console.log("Backend Response:", res.data);
-
-      // Extract based on category key (e.g., res.data.diets)
-      const key = category.toLowerCase(); // 'diets', 'courses', or 'cuisines'
-      const values = res.data[key];
-
-      if (Array.isArray(values)) {
-        setItems(values);
-      } else {
-        console.warn("Unexpected response:", res.data);
-        setItems([]);
+  // Fetch filter options on mount
+  useEffect(() => {
+    Object.entries(FILTER_CATEGORIES).forEach(async ([key, endpoint]) => {
+      try {
+        const res = await axios.get(`http://localhost:5001${endpoint}`);
+        const dataKey = Object.keys(res.data)[0];
+        setOptions(prev => ({ ...prev, [key]: res.data[dataKey] }));
+      } catch (err) {
+        console.error(`Error loading ${key}:`, err);
       }
+    });
+  }, []);
+
+  // Fetch recipes when filters change
+  useEffect(() => {
+    const { cuisine, course, diet } = filters;
+    if (cuisine || course || diet) {
+      fetchRecipes();
+    } else {
+      setRecipes([]);
+    }
+  }, [filters]);
+
+  const fetchRecipes = async () => {
+    setLoading(true);
+    try {
+      const params = new URLSearchParams();
+      Object.entries(filters).forEach(([key, value]) => {
+        if (value) params.append(key, value);
+      });
+
+      const res = await axios.get(`http://localhost:5001/recipes?${params.toString()}`);
+      setRecipes(res.data.recipes || []);
     } catch (err) {
-      console.error('Error fetching category:', err);
-      setItems([]);
+      console.error('Error fetching recipes:', err);
     }
     setLoading(false);
   };
 
-  const filteredItems = items.filter((item) =>
-    item.toLowerCase().includes(search.toLowerCase())
+  const toggleFilter = (type) => {
+    setOpenFilter(prev => (prev === type ? null : type));
+    setSearchInputs(prev => ({ ...prev, [type]: '' }));
+  };
+
+  const handleFilterSelect = (type, value) => {
+    setFilters(prev => ({ ...prev, [type]: value }));
+    setOpenFilter(null);
+  };
+
+  const handleClearFilter = (type) => {
+    setFilters(prev => ({ ...prev, [type]: null }));
+    setOpenFilter(null);
+  };
+
+  const handleSearchInputChange = (type, value) => {
+    setSearchInputs(prev => ({ ...prev, [type]: value }));
+  };
+
+  // Close popup on click outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (popupRef.current && !popupRef.current.contains(e.target)) {
+        setOpenFilter(null);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const renderFilter = (type) => {
+    const filteredOptions = options[type].filter((item) =>
+      item.toLowerCase().includes((searchInputs[type] || '').toLowerCase())
+    );
+
+    return (
+      <div key={type} className="relative">
+        <button
+          onClick={() => toggleFilter(type)}
+          className="bg-yellow-400 hover:bg-yellow-500 text-black font-medium py-2 px-5 rounded-full shadow transition capitalize"
+        >
+          {filters[type] ? `${type}: ${filters[type]}` : `Select ${type}`}
+        </button>
+
+        {openFilter === type && (
+          <div
+            ref={popupRef}
+            className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white border border-gray-300 rounded-xl shadow-2xl p-6 w-full max-w-lg max-h-[80vh] overflow-y-auto z-50"
+          >
+            <h2 className="text-lg font-semibold mb-3 capitalize text-yellow-600">{type} Options</h2>
+            <input
+              type="text"
+              placeholder={`Search ${type}...`}
+              value={searchInputs[type]}
+              onChange={(e) => handleSearchInputChange(type, e.target.value)}
+              className="w-full mb-4 px-4 py-2 border border-gray-300 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400"
+            />
+            <div className="flex flex-wrap gap-2 mb-4">
+              {filteredOptions.length > 0 ? (
+                filteredOptions.map((item, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => handleFilterSelect(type, item)}
+                    className={`px-4 py-2 rounded-full text-sm transition ${
+                      filters[type] === item
+                        ? 'bg-yellow-400 text-black font-semibold'
+                        : 'bg-gray-100 hover:bg-yellow-100 text-gray-700'
+                    }`}
+                  >
+                    {item}
+                  </button>
+                ))
+              ) : (
+                <p className="text-sm text-gray-400">No options found.</p>
+              )}
+            </div>
+            <div className="text-right">
+              <button
+                onClick={() => handleClearFilter(type)}
+                className="text-red-500 hover:underline text-sm mr-4"
+              >
+                Clear selection
+              </button>
+              <button
+                onClick={() => setOpenFilter(null)}
+                className="bg-black text-white px-4 py-2 rounded-full text-sm"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const filteredRecipes = recipes.filter((r) =>
+    r.name.toLowerCase().includes(recipeSearch.toLowerCase())
   );
 
   return (
@@ -63,57 +177,52 @@ const Recipefind = () => {
         </div>
       </header>
 
-      {/* Title */}
+      {/* Page Title */}
       <div className="w-full border-b shadow-sm py-6 px-4 flex items-center justify-center">
         <h1 className="text-3xl md:text-4xl font-bold text-yellow-600 flex items-center gap-2">
-          🍲 Choose a Category
+          🍲 Filter Recipes by Category
         </h1>
       </div>
 
-      {/* Category Buttons */}
-      <div className="mt-8 flex flex-wrap gap-6 justify-center px-6">
-        {Object.keys(CATEGORY_ENDPOINTS).map((category) => (
-          <button
-            key={category}
-            onClick={() => fetchCategoryItems(category)}
-            className="bg-yellow-400 hover:bg-yellow-500 text-black font-semibold py-3 px-6 rounded-full shadow transition"
-          >
-            {category.charAt(0).toUpperCase() + category.slice(1)}
-          </button>
-        ))}
+      {/* Filter Buttons */}
+      <div className="flex gap-4 mt-8 px-6 flex-wrap justify-center">
+        {['cuisine', 'course', 'diet'].map(renderFilter)}
       </div>
 
-      {/* Search Bar */}
-      {items.length > 0 && (
+      {/* Recipe title search */}
+      {recipes.length > 0 && (
         <div className="mt-6 w-full max-w-md px-4">
           <input
             type="text"
-            placeholder={`Search ${selectedCategory}...`}
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search recipes by title..."
+            value={recipeSearch}
+            onChange={(e) => setRecipeSearch(e.target.value)}
             className="w-full py-3 px-5 border border-gray-300 rounded-full text-base focus:outline-none focus:ring-2 focus:ring-yellow-400"
           />
         </div>
       )}
 
-      {/* Loading or Results */}
+      {/* Recipes */}
       {loading ? (
-        <p className="mt-10 text-lg text-gray-500">Loading {selectedCategory}...</p>
-      ) : (
-        <div className="mt-8 flex flex-wrap gap-4 justify-center px-6">
-          {filteredItems.length > 0 ? (
-            filteredItems.map((item, idx) => (
-              <div
-                key={idx}
-                className="bg-yellow-300 text-black font-medium px-4 py-2 rounded-full shadow cursor-pointer hover:bg-yellow-400 transition"
-              >
-                {item}
-              </div>
-            ))
-          ) : selectedCategory && (
-            <p className="text-gray-500 text-lg">No items found for this category.</p>
-          )}
+        <p className="text-lg mt-10 text-gray-500">Loading recipes...</p>
+      ) : filteredRecipes.length > 0 ? (
+        <div className="w-full max-w-6xl grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-10 px-4">
+          {filteredRecipes.map((recipe, idx) => (
+            <div
+              key={idx}
+              className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm"
+            >
+              <h2 className="text-lg font-semibold text-yellow-700 mb-1">
+                {recipe.name}
+              </h2>
+              <p className="text-gray-600 text-sm">
+                Prep Time: {recipe.prep_time}
+              </p>
+            </div>
+          ))}
         </div>
+      ) : (
+        <p className="text-lg mt-10 text-gray-500">No recipes found. Try different filters or title.</p>
       )}
 
       {/* Footer */}
