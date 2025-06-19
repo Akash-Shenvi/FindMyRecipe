@@ -1,7 +1,6 @@
-// Updated professional React frontend for recipe filtering and paginated loading
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const FILTER_CATEGORIES = {
   cuisine: '/cuisines',
@@ -10,7 +9,21 @@ const FILTER_CATEGORIES = {
 };
 
 const RecipeFind = () => {
-  const [filters, setFilters] = useState({ cuisine: '', course: '', diet: '' });
+  const navigate = useNavigate();
+  const location = useLocation();
+  const popupRef = useRef();
+
+  // Parse initial filters from URL
+  const parseQueryParams = () => {
+    const params = new URLSearchParams(location.search);
+    const parsed = {};
+    for (let key of Object.keys(FILTER_CATEGORIES)) {
+      parsed[key] = params.getAll(key);
+    }
+    return parsed;
+  };
+
+  const [filters, setFilters] = useState(parseQueryParams);
   const [options, setOptions] = useState({ cuisine: [], course: [], diet: [] });
   const [searchInputs, setSearchInputs] = useState({ cuisine: '', course: '', diet: '' });
   const [openFilter, setOpenFilter] = useState(null);
@@ -19,9 +32,8 @@ const RecipeFind = () => {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(false);
-  const popupRef = useRef();
-  const navigate = useNavigate();
 
+  // Load filter options
   useEffect(() => {
     Object.entries(FILTER_CATEGORIES).forEach(async ([key, endpoint]) => {
       try {
@@ -34,12 +46,13 @@ const RecipeFind = () => {
     });
   }, []);
 
+  // Fetch recipes
   const fetchRecipes = async (reset = false) => {
     setLoading(true);
     try {
       const params = new URLSearchParams({ limit: 20, page: reset ? 1 : page });
-      Object.entries(filters).forEach(([key, value]) => {
-        if (value) params.append(key, value);
+      Object.entries(filters).forEach(([key, values]) => {
+        values.forEach(val => params.append(key, val));
       });
 
       const res = await axios.get(`http://localhost:5001/recipes?${params.toString()}`);
@@ -60,22 +73,37 @@ const RecipeFind = () => {
     setLoading(false);
   };
 
+  // Update filters in URL
+  const updateURL = (newFilters) => {
+    const params = new URLSearchParams();
+    Object.entries(newFilters).forEach(([key, values]) => {
+      values.forEach(v => params.append(key, v));
+    });
+    navigate({ pathname: location.pathname, search: params.toString() });
+  };
+
   useEffect(() => {
     fetchRecipes(true);
+    updateURL(filters);
   }, [filters]);
 
+  // Filter selection logic
   const toggleFilter = (type) => {
     setOpenFilter(prev => (prev === type ? null : type));
     setSearchInputs(prev => ({ ...prev, [type]: '' }));
   };
 
   const handleFilterSelect = (type, value) => {
-    setFilters(prev => ({ ...prev, [type]: value }));
-    setOpenFilter(null);
+    setFilters(prev => {
+      const updated = prev[type].includes(value)
+        ? prev[type].filter(v => v !== value)
+        : [...prev[type], value];
+      return { ...prev, [type]: updated };
+    });
   };
 
   const clearFilter = (type) => {
-    setFilters(prev => ({ ...prev, [type]: '' }));
+    setFilters(prev => ({ ...prev, [type]: [] }));
     setOpenFilter(null);
   };
 
@@ -96,6 +124,7 @@ const RecipeFind = () => {
   const renderFilter = (type) => {
     const search = searchInputs[type]?.toLowerCase() || '';
     const filtered = options[type].filter((o) => o.toLowerCase().includes(search));
+    const selected = filters[type];
 
     return (
       <div key={type} className="relative">
@@ -103,7 +132,7 @@ const RecipeFind = () => {
           onClick={() => toggleFilter(type)}
           className="bg-yellow-400 hover:bg-yellow-500 text-black font-medium py-2 px-5 rounded-full shadow capitalize"
         >
-          {filters[type] ? `${type}: ${filters[type]}` : `Select ${type}`}
+          {selected.length > 0 ? `${type}: ${selected.join(', ')}` : `Select ${type}`}
         </button>
 
         {openFilter === type && (
@@ -126,7 +155,7 @@ const RecipeFind = () => {
                     key={idx}
                     onClick={() => handleFilterSelect(type, item)}
                     className={`px-4 py-2 rounded-full text-sm transition ${
-                      filters[type] === item
+                      selected.includes(item)
                         ? 'bg-yellow-400 text-black font-semibold'
                         : 'bg-gray-100 hover:bg-yellow-100 text-gray-700'
                     }`}
@@ -156,21 +185,24 @@ const RecipeFind = () => {
 
   return (
     <div className="min-h-screen bg-white text-gray-800 font-serif flex flex-col items-center pb-24">
+      {/* header */}
       <header className="w-full shadow-sm bg-black sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
           <h1 className="text-2xl font-bold text-yellow-400 cursor-pointer" onClick={() => navigate('/')}>🍽️ FindMyRecipe</h1>
           <nav className="space-x-6 text-md font-medium text-white">
-            <button onClick={() => navigate('/')} className="hover:text-yellow-400">Home</button>
+            <button onClick={() => navigate('/home')} className="hover:text-yellow-400">Home</button>
             <button onClick={() => navigate('/about')} className="hover:text-yellow-400">About</button>
             <button onClick={() => navigate('/contact')} className="hover:text-yellow-400">Contact</button>
           </nav>
         </div>
       </header>
 
+      {/* filters */}
       <div className="flex flex-wrap gap-4 mt-8 px-6 justify-center">
         {['cuisine', 'course', 'diet'].map(renderFilter)}
       </div>
 
+      {/* search input */}
       <div className="mt-6 w-full max-w-md px-4">
         <input
           type="text"
@@ -181,6 +213,7 @@ const RecipeFind = () => {
         />
       </div>
 
+      {/* recipe list */}
       {loading && <p className="text-lg mt-10 text-gray-500">Loading...</p>}
 
       {!loading && filteredRecipes.length > 0 && (
@@ -202,6 +235,7 @@ const RecipeFind = () => {
         </div>
       )}
 
+      {/* load more */}
       {!loading && hasMore && (
         <button
           onClick={() => fetchRecipes(false)}
@@ -211,6 +245,7 @@ const RecipeFind = () => {
         </button>
       )}
 
+      {/* no results */}
       {!loading && !filteredRecipes.length && <p className="text-lg mt-10 text-gray-400">No recipes found.</p>}
 
       <footer className="fixed bottom-0 w-full bg-black/30 backdrop-blur-sm text-white text-sm text-center py-4">

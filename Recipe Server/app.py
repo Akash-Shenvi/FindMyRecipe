@@ -34,22 +34,30 @@ def get_diets():
 # 🔥 New: Filter recipes by cuisine, course, diet
 @app.route("/recipes", methods=["GET"])
 def get_recipes():
-    cuisine = request.args.get('cuisine')
-    course = request.args.get('course')
-    diet = request.args.get('diet')
+    # Get multiple values for each filter type
+    cuisines = request.args.getlist('cuisine')
+    courses = request.args.getlist('course')
+    diets = request.args.getlist('diet')
+
     limit = int(request.args.get('limit', 20))
     page = int(request.args.get('page', 1))
 
     filtered = df.copy()
 
-    if cuisine:
-        filtered = filtered[filtered['cuisine'] == cuisine]
-    if course:
-        filtered = filtered[filtered['course'] == course]
-    if diet:
-        filtered = filtered[filtered['diet'] == diet]
+    # Normalize and filter each
+    if cuisines:
+        cuisines = [c.lower().strip() for c in cuisines]
+        filtered = filtered[filtered['cuisine'].str.lower().str.strip().isin(cuisines)]
 
-    result = filtered[['name', 'prep_time', 'image_url','cuisine','course','diet']].dropna()
+    if courses:
+        courses = [c.lower().strip() for c in courses]
+        filtered = filtered[filtered['course'].str.lower().str.strip().isin(courses)]
+
+    if diets:
+        diets = [d.lower().strip() for d in diets]
+        filtered = filtered[filtered['diet'].str.lower().str.strip().isin(diets)]
+
+    result = filtered[['name', 'prep_time', 'image_url', 'cuisine', 'course', 'diet']].dropna()
 
     start = (page - 1) * limit
     end = start + limit
@@ -61,6 +69,7 @@ def get_recipes():
         "limit": limit,
         "recipes": paginated.to_dict(orient='records')
     })
+
 
 @app.route('/recipe', methods=['GET'])
 def get_recipe_by_name():

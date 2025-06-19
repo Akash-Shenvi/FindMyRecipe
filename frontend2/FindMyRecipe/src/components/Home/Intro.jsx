@@ -1,9 +1,17 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Navbar from '../Home/Navbar'; // ✅ Make sure the path is correct
+import Navbar from '../Home/Navbar';
 
 const HomePage = () => {
   const navigate = useNavigate();
+  const [userName, setUserName] = useState('User'); // default fallback
+
+  useEffect(() => {
+    const storedName = localStorage.getItem('profileName');
+    if (storedName) {
+      setUserName(storedName);
+    }
+  }, []);
 
   return (
     <div className="min-h-screen flex flex-col relative text-white">
@@ -17,7 +25,7 @@ const HomePage = () => {
         <div className="absolute inset-0 bg-black opacity-50"></div>
       </div>
 
-      {/* ✅ Reusable Navbar */}
+      {/* Navbar */}
       <Navbar />
 
       {/* Main Content */}
@@ -53,7 +61,7 @@ const HomePage = () => {
 
           <div className="mt-10 text-gray-700 text-base">
             <p>
-              Logged in as <span className="font-semibold text-yellow-500">User</span>. Happy Cooking!
+              Logged in as <span className="font-semibold text-yellow-500">{userName}</span>. Happy Cooking!
             </p>
           </div>
         </div>

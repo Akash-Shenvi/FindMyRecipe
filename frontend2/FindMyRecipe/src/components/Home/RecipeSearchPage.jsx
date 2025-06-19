@@ -27,7 +27,7 @@ const RecipeSearchPage = () => {
         <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
           <h1
             className="text-2xl font-bold text-yellow-400 cursor-pointer"
-            onClick={() => navigate('/')}
+            onClick={() => navigate('/home')}
           >
             🍽️ FindMyRecipe
           </h1>
