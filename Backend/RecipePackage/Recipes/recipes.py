@@ -3,7 +3,7 @@ import pandas as pd
 import os
 
 import re
-
+import csv
 
 # Load CSV
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -165,31 +165,61 @@ def smart_search_recipe_by_name():
 @recipe.route('/search-by-ingredients', methods=['POST'])
 def search_by_ingredients():
     data = request.get_json()
-    ingredients = data.get('ingredients', [])
-    if not ingredients or not isinstance(ingredients, list):
+    user_ingredients = data.get('ingredients', [])
+    if not user_ingredients or not isinstance(user_ingredients, list):
         return jsonify({'error': 'Provide ingredients as a list'}), 400
 
     limit = int(request.args.get('limit', 20))
     page = int(request.args.get('page', 1))
 
-    filtered = df.copy()
-    for ingredient in ingredients:
-        filtered = filtered[filtered['ingredients'].str.lower().str.contains(ingredient.lower(), na=False)]
+    def match_score(row):
+        recipe_ings = row['ingredients']
+        if not isinstance(recipe_ings, str):
+            return 0.0
+        recipe_ings = [ing.strip().lower() for ing in recipe_ings.split(',')]
+        match_count = sum(1 for ing in user_ingredients if ing.lower() in recipe_ings)
+        return match_count / len(recipe_ings) if recipe_ings else 0.0
+
+    df['match_percent'] = df.apply(match_score, axis=1)
+    filtered = df[df['match_percent'] > 0].sort_values(by='match_percent', ascending=False)
 
     total = len(filtered)
     start = (page - 1) * limit
     end = start + limit
 
-    result = filtered[['name', 'prep_time', 'image_url', 'cuisine', 'course', 'diet']].dropna()
+    result = filtered[['name', 'prep_time', 'image_url', 'cuisine', 'course', 'diet', 'ingredients', 'match_percent']].dropna()
     paginated = result.iloc[start:end]
 
     return jsonify({
-        'matched_ingredients': ingredients,
+        'matched_ingredients': user_ingredients,
         'total': total,
         'page': page,
         'limit': limit,
         'recipes': paginated.to_dict(orient='records')
     })
+
+
+import re
+
+@recipe.route('/ingredients', methods=['GET'])
+def get_ingredients():
+    ingredients = []
+
+    # Build absolute path using os module
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    file_path = os.path.join(base_dir, 'ingredient_6L.csv')
+
+    # Read the CSV and collect ingredient names
+    with open(file_path, mode='r', encoding='utf-8') as file:
+        reader = csv.reader(file, delimiter=';')
+        for row in reader:
+            if len(row) > 1:
+                ingredients.append(row[1].strip())
+
+    # Return ingredients in expected format
+    return jsonify({"ingredients": ingredients})
+
+
 
 
 
