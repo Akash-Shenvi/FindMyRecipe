@@ -219,11 +219,6 @@ def get_ingredients():
     # Return ingredients in expected format
     return jsonify({"ingredients": ingredients})
 
-
-
-
-
-
 @recipe.route('/similar-recipes', methods=['GET'])
 def get_similar_recipes():
     name = request.args.get('name', '').strip().lower()
