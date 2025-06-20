@@ -1,18 +1,19 @@
 // RecipeViewPage.jsx
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
 
 const RecipeViewPage = () => {
   const { name } = useParams();
   const [recipe, setRecipe] = useState(null);
+  const [recommendations, setRecommendations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
   useEffect(() => {
     const fetchRecipe = async () => {
       try {
-        const res = await axios.get(`http://localhost:5001/recipe?name=${encodeURIComponent(name)}`);
+        const res = await axios.get(`http://localhost:5000/recipes/recipe?name=${encodeURIComponent(name)}`);
         setRecipe(res.data);
       } catch (err) {
         setError('❌ Could not load recipe.');
@@ -22,6 +23,19 @@ const RecipeViewPage = () => {
     };
 
     fetchRecipe();
+  }, [name]);
+
+  useEffect(() => {
+    const fetchRecommendations = async () => {
+      try {
+        const res = await axios.get(`http://localhost:5000/recipes/similar-recipes?name=${encodeURIComponent(name)}`);
+        setRecommendations(res.data.similar_recipes || []);
+      } catch (err) {
+        console.error("⚠️ Failed to load recommendations", err);
+      }
+    };
+
+    fetchRecommendations();
   }, [name]);
 
   if (loading) return <p className="text-center mt-20 text-gray-600">Loading...</p>;
@@ -65,13 +79,39 @@ const RecipeViewPage = () => {
       )}
 
       {recipe.instructions && (
-        <div>
+        <div className="mb-12">
           <h2 className="text-2xl font-semibold text-yellow-500 mb-2">Instructions</h2>
           <ol className="list-decimal list-inside space-y-2 text-gray-700">
             {recipe.instructions.split(/(?<=\.)\s+(?=[A-Z])/).map((step, idx) => (
               <li key={idx}>{step.trim()}</li>
             ))}
           </ol>
+        </div>
+      )}
+
+      {recommendations.length > 0 && (
+        <div className="mt-12">
+          <h2 className="text-3xl font-bold mb-4 text-yellow-600">You May Also Like</h2>
+          <div className="flex overflow-x-auto gap-4 pb-4">
+            {recommendations.map((item, idx) => (
+              <Link
+                key={idx}
+                to={`/recipe/${encodeURIComponent(item.name)}`}
+                className="min-w-[250px] bg-white rounded-xl shadow-md border border-gray-200 hover:shadow-lg transition duration-300"
+              >
+                <img
+                  src={item.image_url}
+                  alt={item.name}
+                  className="w-full h-40 object-cover rounded-t-xl"
+                />
+                <div className="p-3">
+                  <h3 className="text-lg font-semibold text-gray-800 mb-1 truncate">{item.name}</h3>
+                  <p className="text-sm text-gray-600">{item.cuisine} • {item.course}</p>
+                  <p className="text-sm text-gray-500 mt-1">{item.prep_time}</p>
+                </div>
+              </Link>
+            ))}
+          </div>
         </div>
       )}
     </div>

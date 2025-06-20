@@ -35,4 +35,4 @@ pnpm-debug.log*
 
 __pycache__/
 migrations/
-
+config.json/

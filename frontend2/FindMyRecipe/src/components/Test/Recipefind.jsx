@@ -3,9 +3,9 @@ import axios from 'axios';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 const FILTER_CATEGORIES = {
-  cuisine: '/cuisines',
-  course: '/courses',
-  diet: '/diets',
+  cuisine: '/recipes/cuisines',
+  course: '/recipes/courses',
+  diet: '/recipes/diets',
 };
 
 const RecipeFind = () => {
@@ -37,7 +37,7 @@ const RecipeFind = () => {
   useEffect(() => {
     Object.entries(FILTER_CATEGORIES).forEach(async ([key, endpoint]) => {
       try {
-        const res = await axios.get(`http://localhost:5001${endpoint}`);
+        const res = await axios.get(`http://localhost:5000${endpoint}`);
         const dataKey = Object.keys(res.data)[0];
         setOptions(prev => ({ ...prev, [key]: res.data[dataKey] }));
       } catch (err) {
@@ -46,32 +46,96 @@ const RecipeFind = () => {
     });
   }, []);
 
+  useEffect(() => {
+    const delayDebounce = setTimeout(() => {
+      const query = recipeSearch.trim();
+  
+      if (query) {
+        setPage(1);
+        setHasMore(true);
+        fetchSearchRecipes(query, 1, true);  // reset = true
+      } else {
+        setPage(1);
+        setHasMore(true);
+        fetchRecipes(true);
+      }
+    }, 400);
+  
+    return () => clearTimeout(delayDebounce);
+  }, [recipeSearch, filters]);
+  
+  
+  
+  const fetchSearchRecipes = async (query, pageNum = 1, reset = false) => {
+    setLoading(true);
+    try {
+      const params = new URLSearchParams({ limit: 20, page: pageNum });
+  
+      Object.entries(filters).forEach(([key, values]) => {
+        values.forEach(val => params.append(key, val));
+      });
+  
+      const res = await axios.get(
+        `http://localhost:5000/recipes/search?query=${encodeURIComponent(query)}&${params.toString()}`
+      );
+  
+      const results = res.data.results || [];
+  
+      if (reset) {
+        setRecipes(results);
+      } else {
+        setRecipes(prev => [...prev, ...results]);
+      }
+  
+      setHasMore(results.length === 20);
+      setPage(prev => prev + 1);
+    } catch (err) {
+      console.error("Smart search failed", err);
+    }
+    setLoading(false);
+  };
+  
+  
+  
+
+
+
   // Fetch recipes
   const fetchRecipes = async (reset = false) => {
     setLoading(true);
+  
+    // 👇 FIX START
+    if (reset) {
+      setPage(1);
+      setHasMore(true);
+    }
+    // 👆 FIX END
+  
     try {
       const params = new URLSearchParams({ limit: 20, page: reset ? 1 : page });
       Object.entries(filters).forEach(([key, values]) => {
         values.forEach(val => params.append(key, val));
       });
-
-      const res = await axios.get(`http://localhost:5001/recipes?${params.toString()}`);
+  
+      const res = await axios.get(`http://localhost:5000/recipes/recipes?${params.toString()}`);
       const fetched = res.data.recipes || [];
-
+  
       if (reset) {
         setRecipes(fetched);
-        setPage(2);
+        setPage(2); // Next page
       } else {
         setRecipes(prev => [...prev, ...fetched]);
         setPage(prev => prev + 1);
       }
-
-      setHasMore(fetched.length === 20);
+  
+      setHasMore(fetched.length === 20); // Only show "Load More" if we got full page
     } catch (err) {
       console.error('Failed to fetch recipes:', err);
     }
+  
     setLoading(false);
   };
+  
 
   // Update filters in URL
   const updateURL = (newFilters) => {
@@ -181,7 +245,8 @@ const RecipeFind = () => {
     );
   };
 
-  const filteredRecipes = recipes.filter(r => r.name.toLowerCase().includes(recipeSearch.toLowerCase()));
+  const filteredRecipes = recipes;
+
 
   return (
     <div className="min-h-screen bg-white text-gray-800 font-serif flex flex-col items-center pb-24">
@@ -236,14 +301,22 @@ const RecipeFind = () => {
       )}
 
       {/* load more */}
-      {!loading && hasMore && (
-        <button
-          onClick={() => fetchRecipes(false)}
-          className="mt-8 bg-yellow-400 hover:bg-yellow-500 text-black font-bold px-6 py-3 rounded-full shadow"
-        >
-          ⬇️ Load More
-        </button>
-      )}
+      {!loading && hasMore &&  (
+  <button
+  onClick={() => {
+    if (recipeSearch.trim()) {
+      fetchSearchRecipes(recipeSearch.trim(), page, false);
+    } else {
+      fetchRecipes(false);
+    }
+  }}
+  
+    className="mt-8 bg-yellow-400 hover:bg-yellow-500 text-black font-bold px-6 py-3 rounded-full shadow"
+  >
+    ⬇️ Load More
+  </button>
+)}
+
 
       {/* no results */}
       {!loading && !filteredRecipes.length && <p className="text-lg mt-10 text-gray-400">No recipes found.</p>}
