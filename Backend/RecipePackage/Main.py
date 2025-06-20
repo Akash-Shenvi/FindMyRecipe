@@ -1,7 +1,7 @@
 from flask import Flask
 from flask_cors import CORS
 import os,json,datetime
-from RecipePackage.auth.auth import authp
+from RecipePackage.Auth.auth import authp
 from RecipePackage.Models import config
 from RecipePackage.Mail.mailsender import init_mail, send_email
 from RecipePackage.Models.models import db
@@ -10,6 +10,9 @@ from flask_migrate import Migrate
 from flask_jwt_extended import JWTManager
 from authlib.integrations.flask_client import OAuth
 from RecipePackage.oauth import oauth, configure_oauth
+from RecipePackage.Recipes.recipes import recipe
+
+
 app = Flask(__name__)
 configure_oauth(app)
 with open(os.path.join(os.path.dirname(__file__), '../config.json')) as f:
@@ -39,6 +42,7 @@ with app.app_context():
 app.config.from_object(config)
 
 app.register_blueprint(authp, url_prefix='/auth')
+app.register_blueprint(recipe, url_prefix='/recipes')
 
 init_mail(app)
 
