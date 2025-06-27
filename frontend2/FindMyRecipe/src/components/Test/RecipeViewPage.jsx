@@ -22,7 +22,7 @@ const RecipeViewPage = () => {
       }
     };
 
-    fetchRecipe();
+    fetchRecipe();   
   }, [name]);
 
   useEffect(() => {

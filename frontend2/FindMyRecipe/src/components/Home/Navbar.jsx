@@ -57,7 +57,6 @@ const Navbar = () => {
     <header className="w-full bg-black bg-opacity-60 backdrop-blur sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center text-white">
         <h1
-          onClick={() => navigate('/')}
           className="text-xl font-bold text-yellow-400 cursor-pointer"
         >
           🍽️ FindMyRecipe
