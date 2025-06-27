@@ -40,7 +40,7 @@ const HomePage = () => {
 
           <div className="flex flex-col md:flex-row gap-6 justify-center items-center">
             <button
-              onClick={() => navigate('/ingredients')}
+              onClick={() => navigate('/search-by-ingredients')}
               className="bg-yellow-400 hover:bg-yellow-500 text-black font-semibold py-4 px-8 rounded-xl text-lg transition duration-300 shadow-lg"
             >
               🍅 Ingredient-Based Search

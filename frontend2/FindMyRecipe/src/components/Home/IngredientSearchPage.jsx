@@ -55,6 +55,7 @@ const IngredientSearchPage = () => {
       setRecipes(reset ? fetched : [...recipes, ...fetched]);
       setPage(reset ? 2 : page + 1);
       setHasMore(fetched.length === 20);
+      
     } catch (err) {
       console.error('Search error:', err);
     }
