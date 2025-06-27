@@ -19,12 +19,13 @@ def init_mail(app):
     app.config['MAIL_USE_SSL'] = False
     mail.init_app(app)
 
-def send_email(subject, recipient, body):
+def send_email(subject, recipient, body,html=None):
     """Send an email using the initialized mail system."""
     msg = Message(
         subject=subject,
         sender=current_app.config['MAIL_USERNAME'],
         recipients=[recipient],
-        body=body
+        body=body,
+        html=html
     )
     mail.send(msg)

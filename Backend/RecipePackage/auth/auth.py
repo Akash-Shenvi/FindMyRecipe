@@ -5,6 +5,7 @@ import os
 import json
 import datetime
 from RecipePackage.Mail.mailsender import send_email
+from RecipePackage.Mail.defaultmail import send_welcome_email
 from RecipePackage.Models.models import User,db
 from werkzeug.security import generate_password_hash,check_password_hash
 from flask_jwt_extended import jwt_required, get_jwt_identity
@@ -36,7 +37,7 @@ def login():
     data = request.get_json()
     email = data.get('email')
     password = data.get('password')
-
+    send_welcome_email()
     if not email or not password:
         return jsonify({'success': False, 'message': 'Email and password are required'}), 400
 
