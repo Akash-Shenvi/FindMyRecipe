@@ -17,6 +17,7 @@ recipe=Blueprint('recipe',__name__)
 
 @recipe.route("/cuisines", methods=["GET"])
 def get_cuisines():
+    print(DATASET_PATH)
     cuisines = sorted(df['cuisine'].dropna().unique().tolist())
     return jsonify({"cuisines": cuisines})
 

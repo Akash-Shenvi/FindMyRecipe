@@ -24,17 +24,17 @@ const IngredientSearchPage = () => {
   const handleSearch = async (e, newPage = 1) => {
     if (e) e.preventDefault();
     setLoading(true);
-
+    try {
+      // Use newPage for pagination, default to 1 if not provided
+      const pageToFetch = newPage || 1;
       const res = await axios.post(
-        `http://localhost:5000/recipes/search-by-ingredients?limit=20&page=${reset ? 1 : page}`,
+        `http://localhost:5000/recipes/search-by-ingredients?limit=20&page=${pageToFetch}`,
         { ingredients }
       );
       const fetched = res.data.recipes || [];
-      setRecipes(reset ? fetched : [...recipes, ...fetched]);
-      setPage(reset ? 2 : page + 1);
-      setHasMore(fetched.length === 20);
-      
-
+      setRecipes(fetched);
+      setPage(pageToFetch);
+      setTotal(res.data.total || 0);
     } catch (err) {
       console.error("Search error:", err);
     }
