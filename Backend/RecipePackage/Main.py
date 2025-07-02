@@ -11,6 +11,7 @@ from flask_jwt_extended import JWTManager
 from authlib.integrations.flask_client import OAuth
 from RecipePackage.oauth import oauth, configure_oauth
 from RecipePackage.Recipes.recipes import recipe
+from RecipePackage.Airecipe.airecipe import airecipe
 
 
 app = Flask(__name__)
@@ -42,6 +43,7 @@ app.config.from_object(config)
 
 app.register_blueprint(authp, url_prefix='/auth')
 app.register_blueprint(recipe, url_prefix='/recipes')
+app.register_blueprint(airecipe, url_prefix='/airecipe')
 
 init_mail(app)
 
