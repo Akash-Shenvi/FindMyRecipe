@@ -1,9 +1,13 @@
 from flask import Flask, request, jsonify,Blueprint
-import os
+import os,json
 import google.generativeai as genai
 
-
-genai.configure(api_key="AIzaSyA9RN5AkCjhI8SS3Za0dW7QnKuxuKYrMgM")
+with open(os.path.join(os.path.dirname(__file__),'../../config.json')) as a:
+    data = json.load(a)["gemini"]
+# print(data)
+API_KEY = data["apikey"]
+MODEL = data["model"]
+genai.configure(api_key=API_KEY)
 
 airecipe = Blueprint('airecipe', __name__)
 
@@ -12,7 +16,8 @@ def get_gemini_response(prompt_text):
     """
     Sends a prompt to the Gemini API and returns the text response.
     """
-    model = genai.GenerativeModel('gemini-1.5-flash')
+    
+    model = genai.GenerativeModel(MODEL)
 
     try:
         response = model.generate_content(prompt_text)
@@ -29,6 +34,8 @@ def ask_ai():
     """
     # Get JSON data from the request body
     data = request.get_json()
+    print("entered1")
+    print(data)
 
     # Basic validation: Check if 'prompt' key exists in the JSON
     if not data or 'prompt' not in data:
@@ -38,10 +45,29 @@ def ask_ai():
     print(f"Received prompt: '{user_prompt}'")
 
     # Get response from Gemini AI
-    ai_response = get_gemini_response(user_prompt)
-    print(f"Sending AI response: '{ai_response[:100]}...'") # Print first 100 chars
+    prompts = f"""
+Get me the recipe for "{user_prompt}" in the following format:
+Recipe Name, Cuisine, Course, Diet, Prep Time, Description, Ingredients, Instructions.
+If the input does not contain a valid food item or recipe name, respond with: "Enter a valid food item or a recipe."
+""".strip()
+
+    print(prompts)
+    ai_response = get_gemini_response(prompts)
+    
 
     # Return the AI's response as JSON
     return jsonify({"answer": ai_response})
         
         
+"""This Route if for making recipes with few questions to the user.
+"""
+    
+@airecipe.route('/ai-recipe-qusn', methods=['POST'])
+def ai_recipe_qusn():
+    data= request.get_json()
+    promptdata=data['prompt']
+    print(promptdata)
+    airesponse = get_gemini_response(promptdata)
+    return jsonify({"status":True,"answer":airesponse})
+    
+

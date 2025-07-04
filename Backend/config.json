@@ -15,6 +15,10 @@
     "oauth":{
       "client_id":"509951524671-ejq62rju6jg90smol91cltcbsu511b95.apps.googleusercontent.com",
       "client_secret":"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"
+    },
+    "gemini":{
+      "apikey":"AIzaSyA9RN5AkCjhI8SS3Za0dW7QnKuxuKYrMgM",
+      "model":"gemini-1.5-flash"
     }
   }
   
