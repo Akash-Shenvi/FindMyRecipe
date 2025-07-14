@@ -1,6 +1,9 @@
 from flask import Flask, jsonify, request,Blueprint
 import pandas as pd
 import os
+from flask_cors import CORS
+from RecipePackage.Models.models import UploadedRecipe, db
+from flask_cors import cross_origin
 
 import re
 import csv
@@ -290,4 +293,53 @@ def get_similar_recipes():
         "similar_count": len(result),
         "similar_recipes": result.to_dict(orient='records')
     })
+
+
+#@recipe.route('/api/upload-recipe', methods=['POST'])
+@recipe.route('/api/upload-recipe', methods=['POST'])
+@cross_origin(origins='http://localhost:5173', supports_credentials=True)
+def upload_recipe():
+    data = request.get_json(force=True)
+    required_fields = ['title', 'ingredients', 'instructions']
+    if not all(field in data and data[field] for field in required_fields):
+        return jsonify({'error': 'Missing required fields'}), 400
+
+    # Convert list to comma-separated string if needed
+    ingredients_str = (
+        ', '.join(data['ingredients']) if isinstance(data['ingredients'], list) else data['ingredients']
+    )
+
+    new_recipe = UploadedRecipe(
+        title=data['title'],
+        ingredients=ingredients_str,
+        instructions=data['instructions'],
+        image_url=data.get('image_url', '')
+    )
+
+    db.session.add(new_recipe)
+    db.session.commit()
+
+    return jsonify({'message': 'Recipe uploaded successfully!', 'recipe': {
+        'id': new_recipe.id,
+        'title': new_recipe.title,
+        'ingredients': ingredients_str,
+        'instructions': new_recipe.instructions,
+        'image_url': new_recipe.image_url
+    }}), 201
+
+# @recipe.route('/api/recipes', methods=['GET'])
+# def get_all_recipes():
+#     return jsonify(recipes)
+@recipe.route('/api/recipes', methods=['GET'])
+def get_all_recipes():
+    recipes = UploadedRecipe.query.all()
+    return jsonify([
+        {
+            'id': r.id,
+            'title': r.title,
+            'ingredients': r.ingredients,
+            'instructions': r.instructions,
+            'image_url': r.image_url
+        } for r in recipes
+    ])
 

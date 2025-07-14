@@ -17,12 +17,20 @@ const UploadRecipePage = () => {
     setSuccess(false);
     setError('');
     try {
-      const res = await axios.post('http://localhost:5000/api/upload-recipe', {
-        title,
-        ingredients,
-        instructions,
-        image_url: imageUrl,
-      });
+      const res = await axios.post(
+  "http://localhost:5000/recipes/api/upload-recipe",
+  {
+    title,
+    ingredients,
+    instructions,
+    image_url: imageUrl,
+  },
+  {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  }
+);
 
       if (res.status === 201 || res.status === 200) {
         setSuccess(true);

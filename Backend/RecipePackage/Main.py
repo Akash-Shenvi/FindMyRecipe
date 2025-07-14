@@ -14,6 +14,7 @@ from RecipePackage.Recipes.recipes import recipe
 from RecipePackage.Airecipe.airecipe import airecipe
 
 
+
 app = Flask(__name__)
 configure_oauth(app)
 with open(os.path.join(os.path.dirname(__file__), '../config.json')) as f:
@@ -33,7 +34,8 @@ app.config['JWT_SECRET_KEY'] = SECRET_KEY
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = datetime.timedelta(days=30)
 
 db.init_app(app)
-CORS(app)
+#CORS(app)
+CORS(app, resources={r"/*": {"origins": "*"}})  # Allow all origins
 
 migrate = Migrate(app, db)
 with app.app_context():
@@ -44,6 +46,7 @@ app.config.from_object(config)
 app.register_blueprint(authp, url_prefix='/auth')
 app.register_blueprint(recipe, url_prefix='/recipes')
 app.register_blueprint(airecipe, url_prefix='/airecipe')
+#app.register_blueprint(recipe,url_prefix='/recipes')
 
 init_mail(app)
 

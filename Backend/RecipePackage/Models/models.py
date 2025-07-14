@@ -17,3 +17,15 @@ class User(db.Model):
     # def __repr__(self):
         # return f"<User {self.email}>"
 
+class UploadedRecipe(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(255), nullable=False)
+    ingredients = db.Column(db.Text, nullable=False)
+    instructions = db.Column(db.Text, nullable=False)
+    image_url = db.Column(db.String(500))
+
+    def __init__(self, title, ingredients, instructions, image_url=None):
+        self.title = title
+        self.ingredients = ingredients
+        self.instructions = instructions
+        self.image_url = image_url
