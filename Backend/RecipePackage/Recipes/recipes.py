@@ -295,16 +295,15 @@ def get_similar_recipes():
     })
 
 
-#@recipe.route('/api/upload-recipe', methods=['POST'])
 @recipe.route('/api/upload-recipe', methods=['POST'])
 @cross_origin(origins='http://localhost:5173', supports_credentials=True)
+
 def upload_recipe():
     data = request.get_json(force=True)
     required_fields = ['title', 'ingredients', 'instructions']
     if not all(field in data and data[field] for field in required_fields):
         return jsonify({'error': 'Missing required fields'}), 400
 
-    # Convert list to comma-separated string if needed
     ingredients_str = (
         ', '.join(data['ingredients']) if isinstance(data['ingredients'], list) else data['ingredients']
     )
@@ -313,7 +312,11 @@ def upload_recipe():
         title=data['title'],
         ingredients=ingredients_str,
         instructions=data['instructions'],
-        image_url=data.get('image_url', '')
+        image_url=data.get('image_url', ''),
+        cuisine=data.get('cuisine', ''),
+        course=data.get('course', ''),
+        diet=data.get('diet', ''),
+        prep_time=data.get('prep_time', '')
     )
 
     db.session.add(new_recipe)
@@ -322,14 +325,16 @@ def upload_recipe():
     return jsonify({'message': 'Recipe uploaded successfully!', 'recipe': {
         'id': new_recipe.id,
         'title': new_recipe.title,
-        'ingredients': ingredients_str,
+        'ingredients': new_recipe.ingredients,
         'instructions': new_recipe.instructions,
-        'image_url': new_recipe.image_url
+        'image_url': new_recipe.image_url,
+        'cuisine': new_recipe.cuisine,
+        'course': new_recipe.course,
+        'diet': new_recipe.diet,
+        'prep_time': new_recipe.prep_time
     }}), 201
 
-# @recipe.route('/api/recipes', methods=['GET'])
-# def get_all_recipes():
-#     return jsonify(recipes)
+
 @recipe.route('/api/recipes', methods=['GET'])
 def get_all_recipes():
     recipes = UploadedRecipe.query.all()
@@ -339,7 +344,36 @@ def get_all_recipes():
             'title': r.title,
             'ingredients': r.ingredients,
             'instructions': r.instructions,
-            'image_url': r.image_url
+            'image_url': r.image_url,
+            'cuisine': r.cuisine,
+            'course': r.course,
+            'diet': r.diet,
+            'prep_time': r.prep_time
         } for r in recipes
     ])
 
+@recipe.route('/api/recipes/<int:id>', methods=['DELETE'])
+def delete_recipe(id):
+    recipe = UploadedRecipe.query.get(id)
+    if not recipe:
+        return jsonify({'error': 'Recipe not found'}), 404
+
+    db.session.delete(recipe)
+    db.session.commit()
+    return jsonify({'message': 'Recipe deleted successfully'}), 200
+
+@recipe.route('/api/recipes/<int:id>', methods=['PUT'])
+def update_recipe(id):
+    data = request.get_json()
+    recipe = UploadedRecipe.query.get(id)
+    if not recipe:
+        return jsonify({'error': 'Recipe not found'}), 404
+
+    recipe.title = data.get('title', recipe.title)
+    recipe.ingredients = data.get('ingredients', recipe.ingredients)
+    recipe.instructions = data.get('instructions', recipe.instructions)
+    recipe.image_url = data.get('image_url', recipe.image_url)
+
+    db.session.commit()
+
+    return jsonify({'message': 'Recipe updated successfully'}), 200

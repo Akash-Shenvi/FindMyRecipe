@@ -23,9 +23,17 @@ class UploadedRecipe(db.Model):
     ingredients = db.Column(db.Text, nullable=False)
     instructions = db.Column(db.Text, nullable=False)
     image_url = db.Column(db.String(500))
+    cuisine = db.Column(db.String(100))      # ✅ New
+    course = db.Column(db.String(100))       # ✅ New
+    diet = db.Column(db.String(100))         # ✅ New
+    prep_time = db.Column(db.String(50))     # ✅ New
 
-    def __init__(self, title, ingredients, instructions, image_url=None):
+    def __init__(self, title, ingredients, instructions, image_url=None, cuisine='', course='', diet='', prep_time=''):
         self.title = title
         self.ingredients = ingredients
         self.instructions = instructions
         self.image_url = image_url
+        self.cuisine = cuisine
+        self.course = course
+        self.diet = diet
+        self.prep_time = prep_time

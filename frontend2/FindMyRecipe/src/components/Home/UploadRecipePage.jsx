@@ -8,6 +8,10 @@ const UploadRecipePage = () => {
   const [ingredients, setIngredients] = useState([]);
   const [instructions, setInstructions] = useState('');
   const [imageUrl, setImageUrl] = useState('');
+  const [cuisine, setCuisine] = useState('');
+  const [course, setCourse] = useState('');
+  const [diet, setDiet] = useState('');
+  const [prepTime, setPrepTime] = useState('');
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
@@ -18,19 +22,23 @@ const UploadRecipePage = () => {
     setError('');
     try {
       const res = await axios.post(
-  "http://localhost:5000/recipes/api/upload-recipe",
-  {
-    title,
-    ingredients,
-    instructions,
-    image_url: imageUrl,
-  },
-  {
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  }
-);
+        "http://localhost:5000/recipes/api/upload-recipe",
+        {
+          title,
+          ingredients: ingredients.join(', '),
+          instructions,
+          image_url: imageUrl,
+          cuisine,
+          course,
+          diet,
+          prep_time: prepTime,
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
 
       if (res.status === 201 || res.status === 200) {
         setSuccess(true);
@@ -38,6 +46,10 @@ const UploadRecipePage = () => {
         setIngredients([]);
         setInstructions('');
         setImageUrl('');
+        setCuisine('');
+        setCourse('');
+        setDiet('');
+        setPrepTime('');
       } else {
         setError('Upload failed. Try again.');
       }
@@ -62,6 +74,7 @@ const UploadRecipePage = () => {
             <button onClick={() => navigate('/')} className="hover:text-yellow-400">Home</button>
             <button onClick={() => navigate('/about')} className="hover:text-yellow-400">About Us</button>
             <button onClick={() => navigate('/contact')} className="hover:text-yellow-400">Contact Us</button>
+            <button onClick={() => navigate('/uploaded-recipes')} className="hover:text-yellow-400">Uploaded Recipes</button>
           </nav>
         </div>
       </header>
@@ -84,6 +97,47 @@ const UploadRecipePage = () => {
                 className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
                 required
               />
+            </div>
+
+            {/* New Fields */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-gray-700 font-medium mb-1">Cuisine</label>
+                <input
+                  type="text"
+                  value={cuisine}
+                  onChange={(e) => setCuisine(e.target.value)}
+                  className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-300"
+                />
+              </div>
+              <div>
+                <label className="block text-gray-700 font-medium mb-1">Course</label>
+                <input
+                  type="text"
+                  value={course}
+                  onChange={(e) => setCourse(e.target.value)}
+                  className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-300"
+                />
+              </div>
+              <div>
+                <label className="block text-gray-700 font-medium mb-1">Diet</label>
+                <input
+                  type="text"
+                  value={diet}
+                  onChange={(e) => setDiet(e.target.value)}
+                  className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-300"
+                />
+              </div>
+              <div>
+                <label className="block text-gray-700 font-medium mb-1">Prep Time</label>
+                <input
+                  type="text"
+                  value={prepTime}
+                  onChange={(e) => setPrepTime(e.target.value)}
+                  placeholder="e.g. 40 M"
+                  className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-300"
+                />
+              </div>
             </div>
 
             <div>
@@ -137,8 +191,8 @@ const UploadRecipePage = () => {
 
       {/* Footer */}
       <footer className="fixed bottom-0 w-full z-50 bg-black/40 backdrop-blur-md text-center py-4 text-white text-sm">
-  &copy; {new Date().getFullYear()} FindMyRecipe. All rights reserved.
-</footer>
+        &copy; {new Date().getFullYear()} FindMyRecipe. All rights reserved.
+      </footer>
     </div>
   );
 };

@@ -38,6 +38,7 @@ db.init_app(app)
 CORS(app, resources={r"/*": {"origins": "*"}})  # Allow all origins
 
 migrate = Migrate(app, db)
+
 with app.app_context():
     db.create_all()
 

@@ -12,7 +12,10 @@ import ProfilePage from './components/Home/ProfilePage';
 import ForgotPassword from "./components/Auth/ForgotPassword";
 import Recipefind from "./components/Test/Recipefind";
 import RecipeView from "./components/Test/RecipeViewPage";
-import AuthRedirect from "./components/Auth/AuthRedirect"; // ✅ Import
+import AuthRedirect from "./components/Auth/AuthRedirect"; // ✅
+import UploadedRecipesPage from './components/Home/UploadedRecipesPage';
+import UploadedRecipeDetailsPage from "./components/Home/UploadedRecipeDetailsPage";
+import EditRecipePage from "./components/Home/EditRecipePage";
 
 function App() {
   return (
@@ -41,6 +44,9 @@ function App() {
       <Route path="/forgot" element={<ForgotPassword />} />
       <Route path="/Recipefind" element={<Recipefind />} />
       <Route path="/recipe/:name" element={<RecipeView />} />
+      <Route path="/uploaded-recipes" element={<UploadedRecipesPage />} />
+      <Route path="/uploaded-recipes/:id" element={<UploadedRecipeDetailsPage />} />
+      <Route path="/edit-recipe/:id" element={<EditRecipePage />} />
     </Routes>
   );
 }
