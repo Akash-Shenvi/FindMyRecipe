@@ -12,31 +12,33 @@ import ProfilePage from './components/Home/ProfilePage';
 import ForgotPassword from "./components/Auth/ForgotPassword";
 import Recipefind from "./components/Test/Recipefind";
 import RecipeView from "./components/Test/RecipeViewPage";
-import AuthRedirect from "./components/Auth/AuthRedirect"; // ✅
 import UploadedRecipesPage from './components/Home/UploadedRecipesPage';
 import UploadedRecipeDetailsPage from "./components/Home/UploadedRecipeDetailsPage";
 import EditRecipePage from "./components/Home/EditRecipePage";
-
+import Airecipe from "./components/Ai-Recipe/Airecipe";
+import Intropage from "./components/Home/Intropage";
+import Savedrecipes from "./components/Ai-Recipe/Savedrecipe";
 function App() {
   return (
     <Routes>
       <Route
-        path="/"
+        path="/register"
         element={
-          <AuthRedirect>
+          
             <RegistrationPage />
-          </AuthRedirect>
+          
         }
       />
       <Route
         path="/login"
         element={
-          <AuthRedirect>
+          
             <LoginPage />
-          </AuthRedirect>
+         
         }
       />
       <Route path="/home" element={<Intro />} />
+      <Route path="/" element={<Intropage/>}/>
       <Route path="/search-by-ingredients" element={<IngredientSearchPage />} />
       <Route path="/search" element={<RecipeSearchPage />} />
       <Route path="/upload" element={<UploadRecipePage />} />
@@ -47,6 +49,8 @@ function App() {
       <Route path="/uploaded-recipes" element={<UploadedRecipesPage />} />
       <Route path="/uploaded-recipes/:id" element={<UploadedRecipeDetailsPage />} />
       <Route path="/edit-recipe/:id" element={<EditRecipePage />} />
+      <Route path="/ai-recipe" element={<Airecipe />} />
+      <Route path="/saved-recipes" element={<Savedrecipes />} />
     </Routes>
   );
 }

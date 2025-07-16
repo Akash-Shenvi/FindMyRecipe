@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request,url_for
 import random
-from flask_jwt_extended import create_access_token
+from flask_jwt_extended import create_access_token,verify_jwt_in_request,jwt_required
 import os
 import json
 import datetime
@@ -323,3 +323,9 @@ def google_callback():
   window.close();
 </script>
 """
+
+@authp.route('/check-auth', methods=['GET'])
+@jwt_required()
+def check_auth():
+    return jsonify({'authorized': True}), 200
+    

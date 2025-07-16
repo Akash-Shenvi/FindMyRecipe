@@ -1,6 +1,9 @@
 from flask import Flask, request, jsonify,Blueprint
 import os,json
 import google.generativeai as genai
+import json
+from flask_jwt_extended import jwt_required, get_jwt_identity
+from RecipePackage.Models.models import Aisavedrecipe, db
 
 with open(os.path.join(os.path.dirname(__file__),'../../config.json')) as a:
     data = json.load(a)["gemini"]
@@ -62,12 +65,119 @@ If the input does not contain a valid food item or recipe name, respond with: "E
 """This Route if for making recipes with few questions to the user.
 """
     
+import re
+import json
+from flask import request, jsonify
+
 @airecipe.route('/ai-recipe-qusn', methods=['POST'])
 def ai_recipe_qusn():
-    data= request.get_json()
-    promptdata=data['prompt']
-    print(promptdata)
+    data = request.get_json()
+    print(data)
+
+    meal = data.get("mealType")
+    ingredient = data.get("mainIngredient").strip()
+    spice = data.get("spiceLevel")
+    cuisine = data.get("cuisine")
+    time = data.get("timeAvailable")
+
+    promptdata = f"""
+    Generate a {spice} {cuisine} recipe for {meal} using {ingredient}.
+    The recipe should take about {time} to prepare.
+    Return the response strictly in this JSON format:
+
+{{
+  "name": "...",
+  "prep_time": ...,
+  "ingredients": ["...", "..."],
+  "steps": ["...", "..."]
+}}
+    """
+    print("Prompt:", promptdata)
+
     airesponse = get_gemini_response(promptdata)
-    return jsonify({"status":True,"answer":airesponse})
+    print("Raw AI Response:")
+    print(airesponse)
+
+    # ✅ Clean any ```json ... ``` or ``` blocks
+    cleaned = re.sub(r"```(?:json)?\s*([\s\S]*?)```", r"\1", airesponse).strip()
+    print("Cleaned AI Response:")
+    print(cleaned)
+
+    # ✅ Now try to parse cleaned string into dict
+    try:
+        parsed = json.loads(cleaned)
+    except json.JSONDecodeError as e:
+        print("JSON decode failed:", e)
+        return jsonify({"status": False, "error": "AI response not valid JSON"}), 400
+
+    print("Parsed Recipe:")
+    print(parsed)
+
+    return jsonify({"status": True, "answer": parsed})
+
+@airecipe.route('/ai-recipe-save', methods=['POST'])
+@jwt_required()
+def ai_recipe_save():
+    
+    current_user_id = get_jwt_identity()
+    data = request.get_json()
+    recipe_name = data['name']
+    print("Current User ID:", current_user_id)
+    new_recipe= Aisavedrecipe(
+        user_id=current_user_id,
+        recipe=data,
+        recipe_name=recipe_name,
+        
+    )
+    db.session.add(new_recipe)
+    db.session.commit()
+    return jsonify({"status": True, "message": "Recipe saved successfully"}), 200
+
+@airecipe.route('/ai-recipe-saved', methods=['GET'])
+@jwt_required()
+def ai_recipe_saved():
+    current_user_id = get_jwt_identity()
+    print("Current User ID:", current_user_id)
+
+    saved_recipes = Aisavedrecipe.query.filter_by(user_id=current_user_id).all()
+
+    # Extract only recipe_id and recipe name
+    recipes_list = [
+        {
+            "id": recipe.recipe_id,
+            "name": recipe.recipe.get("name", "Unnamed Recipe")
+        }
+        for recipe in saved_recipes
+    ]
+
+    return jsonify({"status": True, "recipes": recipes_list}), 200
+
+@airecipe.route('/ai-recipe-view/<int:recipe_id>', methods=['GET'])
+@jwt_required()
+def ai_recipe_view(recipe_id):
+    current_user_id = get_jwt_identity()
+    print("Current User ID:", current_user_id)
+
+    recipe = Aisavedrecipe.query.filter_by(recipe_id=recipe_id, user_id=current_user_id).first()
+
+    if not recipe:
+        return jsonify({"status": False, "message": "Recipe not found"}), 404
+
+    return jsonify({"status": True, "recipe": recipe.recipe}), 200
     
 
+@airecipe.route('/ai-recipe-delete/<int:recipe_id>', methods=['DELETE'])
+@jwt_required()
+def ai_recipe_delete(recipe_id):
+    current_user_id = get_jwt_identity()
+    print("Current User ID:", current_user_id)
+
+    recipe = Aisavedrecipe.query.filter_by(recipe_id=recipe_id, user_id=current_user_id).first()
+
+    if not recipe:
+        return jsonify({"status": False, "message": "Recipe not found"}), 404
+
+    db.session.delete(recipe)
+    db.session.commit()
+
+    return jsonify({"status": True, "message": "Recipe deleted successfully"}), 200

@@ -46,7 +46,7 @@ const HomePage = () => {
               🍅 Ingredient-Based Search
             </button>
             <button
-              onClick={() => navigate('/search')}
+              onClick={() => navigate('/recipefind')}
               className="bg-white border border-yellow-500 hover:bg-yellow-100 text-black font-semibold py-4 px-8 rounded-xl text-lg transition duration-300 shadow-lg"
             >
               🔍 Search by Recipe Name

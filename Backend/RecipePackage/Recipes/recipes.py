@@ -1,9 +1,9 @@
-from flask import Flask, jsonify, request,Blueprint
+from flask import  jsonify, request,Blueprint
 import pandas as pd
 import os
-from flask_cors import CORS
+
 from RecipePackage.Models.models import UploadedRecipe, db
-from flask_cors import cross_origin
+
 
 import re
 import csv
@@ -296,10 +296,11 @@ def get_similar_recipes():
 
 
 @recipe.route('/api/upload-recipe', methods=['POST'])
-@cross_origin(origins='http://localhost:5173', supports_credentials=True)
+
 
 def upload_recipe():
     data = request.get_json(force=True)
+    print(data)
     required_fields = ['title', 'ingredients', 'instructions']
     if not all(field in data and data[field] for field in required_fields):
         return jsonify({'error': 'Missing required fields'}), 400

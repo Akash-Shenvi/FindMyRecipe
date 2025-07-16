@@ -37,3 +37,10 @@ class UploadedRecipe(db.Model):
         self.course = course
         self.diet = diet
         self.prep_time = prep_time
+
+class Aisavedrecipe(db.Model):
+    recipe_id=db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    recipe_name = db.Column(db.String(255), nullable=False)
+    recipe=db.Column(db.JSON, nullable=False)
+    
