@@ -57,6 +57,7 @@ const UploadedRecipeDetailsPage = () => {
 
   return (
     <div className="min-h-screen bg-white px-6 py-12 max-w-4xl mx-auto">
+        
       {/* Header buttons */}
       <div className="flex justify-between items-center mb-6">
         <button

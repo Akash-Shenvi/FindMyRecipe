@@ -27,7 +27,24 @@ const UploadedRecipesPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 py-16 px-4">
+    
+    // <div className="min-h-screen bg-gray-100 py-16 px-4">
+    <div className="relative min-h-screen bg-gray-100 pb-28">
+        <header className="w-full border-b border-gray-800 shadow-sm bg-black sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+          <h1
+            className="text-2xl font-bold text-yellow-400 cursor-pointer"
+            onClick={() => navigate('/home')}
+          >
+            🍽️ FindMyRecipe
+          </h1>
+          <nav className="space-x-6 text-md font-medium text-white">
+            <button onClick={() => navigate('/')} className="hover:text-yellow-400">Home</button>
+            <button onClick={() => navigate('/about')} className="hover:text-yellow-400">About Us</button>
+            <button onClick={() => navigate('/contact')} className="hover:text-yellow-400">Contact Us</button>
+          </nav>
+        </div>
+      </header>
       <div className="max-w-5xl mx-auto">
         <h1 className="text-4xl font-bold text-yellow-600 mb-8 text-center">📜 Uploaded Recipes</h1>
         
