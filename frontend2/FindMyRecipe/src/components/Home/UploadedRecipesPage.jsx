@@ -10,7 +10,7 @@ const UploadedRecipesPage = () => {
   useEffect(() => {
     const fetchRecipes = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/recipes/api/recipes");
+        const res = await axios.get("https://find-my-recipe-backend.web.app/recipes/api/recipes");
         setRecipes(res.data);
       } catch (error) {
         console.error("Failed to fetch recipes:", error);

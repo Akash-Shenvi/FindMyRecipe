@@ -25,7 +25,7 @@ const EditRecipePage = () => {
   const handleUpdate = async (e) => {
     e.preventDefault();
     try {
-      await axios.put(`http://localhost:5000/recipes/api/recipes/${id}`, {
+      await axios.put(`https://find-my-recipe-backend.web.app/recipes/api/recipes/${id}`, {
         title,
         ingredients: ingredients.join(', '),
         instructions,

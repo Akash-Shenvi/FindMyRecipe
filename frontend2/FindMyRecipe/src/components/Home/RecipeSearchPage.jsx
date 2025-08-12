@@ -12,7 +12,7 @@ const RecipeSearchPage = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await axios.get(`http://localhost:5000/api/search-by-recipe?name=${query}`);
+      const res = await axios.get(`https://find-my-recipe-backend.web.app/api/search-by-recipe?name=${query}`);
       setRecipes(res.data.recipes || []);
     } catch (err) {
       console.error(err);

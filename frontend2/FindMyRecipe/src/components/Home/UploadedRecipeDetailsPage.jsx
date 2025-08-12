@@ -38,7 +38,7 @@ const UploadedRecipeDetailsPage = () => {
   if (!confirmDelete) return;
 
   try {
-    const response = await fetch(`http://localhost:5000/recipes/api/recipes/${recipe.id}`, {
+    const response = await fetch(`https://find-my-recipe-backend.web.app/recipes/api/recipes/${recipe.id}`, {
       method: 'DELETE',
     });
 

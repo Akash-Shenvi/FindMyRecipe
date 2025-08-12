@@ -13,7 +13,7 @@ const Savedrecipes = () => {
   useEffect(() => {
     const fetchRecipeList = async () => {
       try {
-        const res = await axios.get('http://localhost:5000/airecipe/ai-recipe-saved', {
+        const res = await axios.get('https://find-my-recipe-backend.web.app/airecipe/ai-recipe-saved', {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (res.data.status) setRecipes(res.data.recipes);
@@ -29,7 +29,7 @@ const Savedrecipes = () => {
   // Fetch full recipe when a title is clicked
   const fetchRecipeDetails = async (id) => {
     try {
-      const res = await axios.get(`http://localhost:5000/airecipe/ai-recipe-view/${id}`, {
+      const res = await axios.get(`https://find-my-recipe-backend.web.app/airecipe/ai-recipe-view/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (res.data.status) {
@@ -44,7 +44,7 @@ const Savedrecipes = () => {
   // Delete a saved recipe
   const deleteRecipe = async (id) => {
     try {
-      const res = await axios.delete(`http://localhost:5000/airecipe/ai-recipe-delete/${id}`, {
+      const res = await axios.delete(`https://find-my-recipe-backend.web.app/airecipe/ai-recipe-delete/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (res.data.status) {

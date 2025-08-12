@@ -22,7 +22,7 @@ const UploadRecipePage = () => {
     setError('');
     try {
       const res = await axios.post(
-        "http://localhost:5000/recipes/api/upload-recipe",
+        "https://find-my-recipe-backend.web.app/recipes/api/upload-recipe",
         {
           title,
           ingredients: ingredients.join(', '),

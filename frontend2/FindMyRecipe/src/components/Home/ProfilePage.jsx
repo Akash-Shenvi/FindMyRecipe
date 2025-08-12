@@ -15,7 +15,7 @@ const ProfilePage = () => {
   const [message, setMessage] = useState('');
 
   const axiosAuth = axios.create({
-    baseURL: 'http://localhost:5000',
+    baseURL: 'https://find-my-recipe-backend.web.app',
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -70,7 +70,7 @@ const ProfilePage = () => {
         formData.append('image', selectedImageFile);
       }
 
-      const res = await axios.put('http://localhost:5000/auth/update-profile', formData, {
+      const res = await axios.put('https://find-my-recipe-backend.web.app/auth/update-profile', formData, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data',

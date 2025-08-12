@@ -21,7 +21,7 @@ const Navbar = () => {
   const fetchUserInfo = async () => {
     try {
       const token = localStorage.getItem('token'); // or however you're storing it
-      const res = await axios.get('http://localhost:5000/auth/whoami', {
+      const res = await axios.get('https://find-my-recipe-backend.web.app/auth/whoami', {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -34,7 +34,7 @@ const Navbar = () => {
         if (image?.startsWith('data:image')) {
           setProfileImg(image);
         } else if (image) {
-          setProfileImg(`http://localhost:5000/${image}`);
+          setProfileImg(`https://find-my-recipe-backend.web.app/${image}`);
         } else {
           setProfileImg(defaultProfileImage);
         }

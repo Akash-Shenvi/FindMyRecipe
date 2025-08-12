@@ -37,7 +37,7 @@ const RecipeFind = () => {
   useEffect(() => {
     Object.entries(FILTER_CATEGORIES).forEach(async ([key, endpoint]) => {
       try {
-        const res = await axios.get(`http://localhost:5000${endpoint}`);
+        const res = await axios.get(`https://find-my-recipe-backend.web.app${endpoint}`);
         const dataKey = Object.keys(res.data)[0];
         setOptions(prev => ({ ...prev, [key]: res.data[dataKey] }));
       } catch (err) {
@@ -76,7 +76,7 @@ const RecipeFind = () => {
       });
   
       const res = await axios.get(
-        `http://localhost:5000/recipes/search?query=${encodeURIComponent(query)}&${params.toString()}`
+        `https://find-my-recipe-backend.web.app/recipes/search?query=${encodeURIComponent(query)}&${params.toString()}`
       );
   
       const results = res.data.results || [];
@@ -117,7 +117,7 @@ const RecipeFind = () => {
         values.forEach(val => params.append(key, val));
       });
   
-      const res = await axios.get(`http://localhost:5000/recipes/recipes?${params.toString()}`);
+      const res = await axios.get(`https://find-my-recipe-backend.web.app/recipes/recipes?${params.toString()}`);
       const fetched = res.data.recipes || [];
   
       if (reset) {

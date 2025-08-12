@@ -13,7 +13,7 @@ const RecipeViewPage = () => {
   useEffect(() => {
     const fetchRecipe = async () => {
       try {
-        const res = await axios.get(`http://localhost:5000/recipes/recipe?name=${encodeURIComponent(name)}`);
+        const res = await axios.get(`https://find-my-recipe-backend.web.app/recipes/recipe?name=${encodeURIComponent(name)}`);
         setRecipe(res.data);
       } catch (err) {
         setError('❌ Could not load recipe.');
@@ -28,7 +28,7 @@ const RecipeViewPage = () => {
   useEffect(() => {
     const fetchRecommendations = async () => {
       try {
-        const res = await axios.get(`http://localhost:5000/recipes/similar-recipes?name=${encodeURIComponent(name)}`);
+        const res = await axios.get(`https://find-my-recipe-backend.web.app/recipes/similar-recipes?name=${encodeURIComponent(name)}`);
         setRecommendations(res.data.similar_recipes || []);
       } catch (err) {
         console.error("⚠️ Failed to load recommendations", err);

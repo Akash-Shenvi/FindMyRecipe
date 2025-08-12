@@ -51,7 +51,7 @@ const Airecipe = () => {
     setSaved(false);
 
     try {
-      const res = await axios.post('http://localhost:5000/airecipe/ai-recipe-qusn', answers);
+      const res = await axios.post('https://find-my-recipe-backend.web.app/airecipe/ai-recipe-qusn', answers);
       if (res.data.status && res.data.answer) {
         setRecipe(res.data.answer);
       } else {
@@ -67,7 +67,7 @@ const Airecipe = () => {
   const saveRecipe = async () => {
     const token = localStorage.getItem("token");
     try {
-      await axios.post('http://localhost:5000/airecipe/ai-recipe-save', recipe, {
+      await axios.post('https://find-my-recipe-backend.web.app/airecipe/ai-recipe-save', recipe, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

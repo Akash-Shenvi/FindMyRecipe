@@ -11,7 +11,7 @@ const Intro = () => {
       if (!token) return; // No token, don't do anything
 
       try {
-        const response = await axios.get('http://localhost:5000/auth/check-auth', {
+        const response = await axios.get('https://find-my-recipe-backend.web.app/auth/check-auth', {
           headers: {
             Authorization: `Bearer ${token}`,
           },

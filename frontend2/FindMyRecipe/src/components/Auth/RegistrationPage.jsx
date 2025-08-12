@@ -34,7 +34,7 @@ const RegisterPage = () => {
 
     setIsLoading(true);
     try {
-      const res = await axios.post('http://localhost:5000/auth/send-email-otp-register', { email });
+      const res = await axios.post('https://find-my-recipe-backend.web.app/auth/send-email-otp-register', { email });
       if (res.data.success) {
         setOtpSent(true);
         setMessage('✅ OTP sent to your email.');
@@ -55,7 +55,7 @@ const RegisterPage = () => {
 
     setIsLoading(true);
     try {
-      const res = await axios.post('http://localhost:5000/auth/register', {
+      const res = await axios.post('https://find-my-recipe-backend.web.app/auth/register', {
         name,
         email,
         password,

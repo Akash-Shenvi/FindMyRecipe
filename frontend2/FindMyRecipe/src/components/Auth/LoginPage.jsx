@@ -17,7 +17,7 @@ const LoginPage = () => {
     }
 
     try {
-      const res = await axios.post('http://localhost:5000/auth/login', {
+      const res = await axios.post('https://find-my-recipe-backend.web.app/auth/login', {
         email,
         password,
       });
@@ -41,13 +41,13 @@ const LoginPage = () => {
 
   const handleGoogleLogin = () => {
     const popup = window.open(
-      'http://localhost:5000/auth/google-login',
+      'https://find-my-recipe-backend.web.app/auth/google-login',
       'googleLogin',
       'width=500,height=600'
     );
 
     const listener = (event) => {
-      if (event.origin !== 'http://localhost:5000') return;
+      if (event.origin !== 'https://find-my-recipe-backend.web.app') return;
 
       const { token, message } = event.data;
       if (token) {

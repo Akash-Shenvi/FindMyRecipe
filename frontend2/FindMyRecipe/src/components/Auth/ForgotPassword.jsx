@@ -13,7 +13,7 @@ const ForgotPassword = () => {
   const sendOtp = async () => {
     setIsLoading(true);
     try {
-      const res = await axios.post('http://localhost:5000/auth/send-email-otp-forgotpassword', {
+      const res = await axios.post('https://find-my-recipe-backend.web.app/auth/send-email-otp-forgotpassword', {
         email: emailOrMobile,
       });
 
@@ -33,7 +33,7 @@ const ForgotPassword = () => {
   const verifyOtp = async () => {
     setIsLoading(true);
     try {
-      const res = await axios.post('http://localhost:5000/auth/forgot-password/verify-otp', {
+      const res = await axios.post('https://find-my-recipe-backend.web.app/auth/forgot-password/verify-otp', {
         identifier: emailOrMobile,
         otp,
       });
@@ -53,7 +53,7 @@ const ForgotPassword = () => {
   const resetPassword = async () => {
     setIsLoading(true);
     try {
-      const res = await axios.post('http://localhost:5000/auth/forgot-password/reset', {
+      const res = await axios.post('https://find-my-recipe-backend.web.app/auth/forgot-password/reset', {
         identifier: emailOrMobile,
         newPassword,
       });

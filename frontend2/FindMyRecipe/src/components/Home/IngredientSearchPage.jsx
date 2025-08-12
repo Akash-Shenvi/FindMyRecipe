@@ -14,7 +14,7 @@ const IngredientSearchPage = () => {
 
   const fetchSuggestions = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/ingredient-suggestions');
+      const res = await axios.get('https://find-my-recipe-backend.web.app/api/ingredient-suggestions');
       setSuggestions(res.data);
     } catch (err) {
       console.error("Suggestion fetch error:", err);
@@ -28,7 +28,7 @@ const IngredientSearchPage = () => {
       // Use newPage for pagination, default to 1 if not provided
       const pageToFetch = newPage || 1;
       const res = await axios.post(
-        `http://localhost:5000/recipes/search-by-ingredients?limit=20&page=${pageToFetch}`,
+        `https://find-my-recipe-backend.web.app/recipes/search-by-ingredients?limit=20&page=${pageToFetch}`,
         { ingredients }
       );
       const fetched = res.data.recipes || [];
