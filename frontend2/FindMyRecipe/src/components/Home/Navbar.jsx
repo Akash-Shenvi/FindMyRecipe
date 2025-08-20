@@ -66,7 +66,7 @@ const Navbar = () => {
           <button onClick={() => navigate('/')} className="hover:text-yellow-300">
             Home
           </button>
-          <button onClick={() => navigate('/about')} className="hover:text-yellow-300">
+          <button onClick={() => navigate('/about-us')} className="hover:text-yellow-300">
             About Us
           </button>
           <button onClick={() => navigate('/contact')} className="hover:text-yellow-300">

@@ -18,6 +18,7 @@ import EditRecipePage from "./components/Home/EditRecipePage";
 import Airecipe from "./components/Ai-Recipe/Airecipe";
 import Intropage from "./components/Home/Intropage";
 import Savedrecipes from "./components/Ai-Recipe/Savedrecipe";
+import AboutUsPage from "./components/Home/AboutUsPage";
 function App() {
   return (
     <Routes>
@@ -39,7 +40,7 @@ function App() {
       />
       <Route path="/home" element={<Intro />} />
       <Route path="/" element={<Intropage/>}/>
-      <Route path="/search-by-ingredients" element={<IngredientSearchPage />} />
+      <Route path="/search-by-ingredients" element={<IngredientSearchPage />} /> 
       <Route path="/search" element={<RecipeSearchPage />} />
       <Route path="/upload" element={<UploadRecipePage />} />
       <Route path="/profile" element={<ProfilePage />} />
@@ -51,6 +52,7 @@ function App() {
       <Route path="/edit-recipe/:id" element={<EditRecipePage />} />
       <Route path="/ai-recipe" element={<Airecipe />} />
       <Route path="/saved-recipes" element={<Savedrecipes />} />
+      <Route path="/about-us" element={<AboutUsPage />} />
     </Routes>
   );
 }

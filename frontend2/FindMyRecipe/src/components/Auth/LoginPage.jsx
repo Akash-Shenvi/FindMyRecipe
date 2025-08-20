@@ -41,7 +41,7 @@ const LoginPage = () => {
 
   const handleGoogleLogin = () => {
     const popup = window.open(
-      'https://find-my-recipe-backend.web.app/auth/google-login',
+      'https://recipe-api-k26hqvqwva-uc.a.run.app/auth/google-login',
       'googleLogin',
       'width=500,height=600'
     );
