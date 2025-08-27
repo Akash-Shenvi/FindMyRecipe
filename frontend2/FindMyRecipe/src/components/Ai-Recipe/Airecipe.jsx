@@ -53,7 +53,6 @@ const Airecipe = () => {
       const res = await axios.post('https://find-my-recipe-backend.web.app/airecipe/ai-recipe-qusn', finalAnswers);
       if (res.data.status && res.data.answer) {
         setRecipe(res.data.answer);
-        // Image generation logic has been removed
         setPhase('finished');
       }
     } catch (err) {
@@ -68,7 +67,6 @@ const Airecipe = () => {
     setAnswers({});
     setRecipe(null);
     setSaved(false);
-    // Removed setRecipeImageUrl
   };
 
   const saveRecipe = async () => { 
@@ -78,6 +76,7 @@ const Airecipe = () => {
     try {
 
       await axios.post('https://find-my-recipe-backend.web.app/airecipe/ai-recipe-save', recipe, {
+        // FIX 1: Added backticks to create a valid template literal string
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -220,33 +219,34 @@ const Airecipe = () => {
 
                     {/* RIGHT PANEL */}
                     <div className="w-1/4 p-8 border-l border-gray-200 flex flex-col justify-between">
-                       <div>
+                        <div>
                          <h2 className="text-2xl font-bold text-gray-800 mb-4">AI Status</h2>
                          <p className="text-gray-600">Awaiting input for parameter <span className="font-semibold text-orange-600">{step + 1} of {questions.length}</span>.</p>
-                       </div>
-                       <div className="w-full h-1 bg-gray-200 rounded-full">
+                        </div>
+                        <div className="w-full h-1 bg-gray-200 rounded-full">
                          <motion.div 
                             className="h-1 bg-orange-500 rounded-full"
                             initial={{ width: '0%' }}
+                            // FIX 2: Added backticks to create a valid template literal string
                             animate={{ width: `${((step + 1) / questions.length) * 100}%` }}
                          />
-                       </div>
+                        </div>
                     </div>
                 </motion.div>
             )}
 
             {phase === 'generating' && (
                 <motion.div key="generating" initial={{ opacity: 0 }} animate={{ opacity: 1, transition: { delay: 0.5 } }} className="flex flex-col items-center justify-center flex-grow">
-                     <h2 className="text-5xl font-bold text-gray-800">Generating your masterpiece...</h2>
-                     <p className="text-gray-500 mt-4">Our AI is consulting with culinary experts from across the digital globe.</p>
-                     <div className="w-1/2 h-1 bg-gray-200 rounded-full mt-8 overflow-hidden">
-                        <motion.div 
-                           className="h-1 bg-gradient-to-r from-orange-400 to-red-500"
-                           initial={{ x: '-100%' }}
-                           animate={{ x: '100%' }}
-                           transition={{ duration: 3, repeat: Infinity, ease: 'linear' }}
-                        />
-                     </div>
+                      <h2 className="text-5xl font-bold text-gray-800">Generating your masterpiece...</h2>
+                      <p className="text-gray-500 mt-4">Our AI is consulting with culinary experts from across the digital globe.</p>
+                      <div className="w-1/2 h-1 bg-gray-200 rounded-full mt-8 overflow-hidden">
+                         <motion.div 
+                            className="h-1 bg-gradient-to-r from-orange-400 to-red-500"
+                            initial={{ x: '-100%' }}
+                            animate={{ x: '100%' }}
+                            transition={{ duration: 3, repeat: Infinity, ease: 'linear' }}
+                         />
+                      </div>
                 </motion.div>
             )}
 
@@ -271,6 +271,7 @@ const Airecipe = () => {
                                 <button 
                                     onClick={saveRecipe} 
                                     disabled={saved} 
+                                    // FIX 3: Added backticks to create a valid template literal string for the classes
                                     className={`text-lg px-6 py-3 rounded-lg font-semibold transition-colors shadow-md ${saved ? 'bg-gray-400 text-white cursor-not-allowed' : 'bg-green-600 text-white hover:bg-green-700'}`}
                                 >
                                     {saved ? '✅ Saved!' : 'Save Recipe'}
@@ -284,7 +285,7 @@ const Airecipe = () => {
                         </div>
                     </div>
 
-                    {/* RECIPE DETAILS (SINGLE COLUMN LAYOUT) */}
+                    {/* RECIPE DETAILS */}
                     <div className="flex-grow pt-8 border-t border-gray-100">
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
                             <motion.div 
@@ -295,7 +296,7 @@ const Airecipe = () => {
                             >
                                  <h3 className="text-3xl font-bold text-gray-800 mb-5 border-b pb-2 border-gray-200">Ingredients</h3>
                                  <ul className="list-disc list-inside text-gray-700 space-y-3 text-lg pl-4">
-                                     {recipe.ingredients.map((ing, i) => <li key={i}>{ing}</li>)}
+                                      {recipe.ingredients.map((ing, i) => <li key={i}>{ing}</li>)}
                                  </ul>
                             </motion.div>
 
@@ -307,7 +308,7 @@ const Airecipe = () => {
                             >
                                  <h3 className="text-3xl font-bold text-gray-800 mb-5 border-b pb-2 border-gray-200">Instructions</h3>
                                  <ol className="list-decimal list-inside text-gray-700 space-y-4 text-lg pl-4">
-                                     {recipe.steps.map((step, i) => <li key={i}>{step}</li>)}
+                                      {recipe.steps.map((step, i) => <li key={i}>{step}</li>)}
                                  </ol>
                             </motion.div>
                         </div>

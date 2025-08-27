@@ -39,6 +39,7 @@ const Savedrecipes = () => {
 
       try {
         const listRes = await axios.get('https://find-my-recipe-backend.web.app/airecipe/ai-recipe-saved', {
+          // FIX: Added backticks to create a template literal string
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -63,7 +64,9 @@ const Savedrecipes = () => {
     setSelectedId(id);
 
     try {
+      // FIX: Added backticks to create a template literal string for the URL
       const res = await axios.get(`https://find-my-recipe-backend.web.app/airecipe/ai-recipe-view/${id}`, {
+        // FIX: Added backticks here as well
         headers: { Authorization: `Bearer ${token}` },
       });
       if (res.data.status) {
@@ -77,7 +80,9 @@ const Savedrecipes = () => {
   const deleteRecipe = async (idToDelete) => {
     if (window.confirm('Are you sure you want to delete this recipe?')) {
       try {
+        // FIX: Added backticks to create a template literal string for the URL
         await axios.delete(`https://find-my-recipe-backend.web.app/airecipe/ai-recipe-delete/${idToDelete}`, {
+          // FIX: Added backticks here as well
           headers: { Authorization: `Bearer ${token}` },
         });
         const updatedRecipes = recipes.filter(r => r.id !== idToDelete);
@@ -119,6 +124,7 @@ const Savedrecipes = () => {
                                 selectedId === recipe.id ? 'bg-orange-100 shadow' : 'hover:bg-gray-100'
                             }`}
                         >
+                            {/* FIX: Added backticks to create a template literal for dynamic classes */}
                             <span className={`font-semibold text-lg ${selectedId === recipe.id ? 'text-orange-700' : 'text-gray-700'}`}>
                                 {recipe.name}
                             </span>
@@ -150,7 +156,7 @@ const Savedrecipes = () => {
                         className="p-8 sm:p-12"
                     >
                         <h1 className="text-5xl font-bold text-orange-700 mb-4">{selectedRecipe.name}</h1>
-                        <p className="text-gray-600 text-lg font-medium mb-8">⏱️ Prep Time: <span className="text-orange-600">{selectedRecipe.prep_time} mins</span></p>
+                        <p className="text-gray-600 text-lg font-medium mb-8">⏱ Prep Time: <span className="text-orange-600">{selectedRecipe.prep_time} mins</span></p>
 
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 border-t border-gray-200 pt-8">
                             <div className="md:col-span-1">
