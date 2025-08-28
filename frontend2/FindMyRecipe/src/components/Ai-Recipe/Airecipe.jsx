@@ -1,144 +1,90 @@
 import React, { useState, useEffect } from 'react';
+
+import { Link } from 'react-router-dom';
+
 import axios from 'axios';
+import { motion, AnimatePresence } from 'framer-motion';
 
-// --- SVG Icon Components ---
-// A collection of icons for a more visual experience.
-const Icons = {
-  Meal: () => <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 3h18v2H3V3zm0 4h18v2H3V7zm0 4h18v2H3v-2zm0 4h18v2H3v-2zm0 4h18v2H3v-2z" /></svg>,
-  Ingredient: () => <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 12h-8m-4 0H4m16 4H4m16-8H4" /></svg>,
-  Cuisine: () => <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2h8a2 2 0 002-2v-1a2 2 0 012-2h1.945M7.8 15.25a2.5 2.5 0 100-5 .5.5 0 01.5.5v4a.5.5 0 01-.5.5zM16.2 15.25a2.5 2.5 0 100-5 .5.5 0 01.5.5v4a.5.5 0 01-.5.5z" /></svg>,
-  Spice: () => <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>,
-  Time: () => <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>,
-  Save: ({ saved }) => (
-    <svg className={`w-5 h-5 mr-2 transition-colors duration-300 ${saved ? 'text-white' : 'text-white'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-      {saved ? <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /> : <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />}
-    </svg>
-  ),
-  Back: () => <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
-};
 
-// --- Child Components ---
+const questions = [
+  { name: "mealType", label: "What type of meal are we creating?", placeholder: "e.g., A hearty dinner" },
+  { name: "mainIngredient", label: "What is the star ingredient?", placeholder: "e.g., Fresh salmon" },
+  { name: "cuisine", label: "Which cuisine inspires you?", placeholder: "e.g., Japanese" },
+  { name: "spiceLevel", label: "What's the desired spice level?", placeholder: "e.g., A mild kick" },
+  { name: "timeAvailable", label: "Finally, how much time do you have?", placeholder: "e.g., About 45 minutes" },
+];
 
-// A clean progress bar to show user's journey.
-const ProgressBar = ({ current, total }) => {
-  const percentage = ((current + 1) / total) * 100;
-  return (
-    <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
-      <div className="bg-green-500 h-2 rounded-full transition-all duration-500 ease-out" style={{ width: `${percentage}%` }}></div>
-    </div>
-  );
-};
-
-// A more engaging loading screen.
-const LoadingScreen = () => (
-  <div className="flex flex-col items-center justify-center text-center p-8">
-    <div className="w-16 h-16 border-4 border-dashed rounded-full animate-spin border-green-500 mb-4"></div>
-    <h2 className="text-2xl font-semibold text-gray-700">Crafting Your Recipe...</h2>
-    <p className="text-gray-500 mt-2">Our AI chef is working its magic!</p>
-  </div>
-);
-
-// The main card for displaying questions to the user.
-const QuestionCard = ({ question, value, onChange, onNext, onBack, isFirst, isLast }) => (
-  <div className="w-full flex-shrink-0">
-    <div className="text-center">
-      <div className="flex items-center justify-center h-16 w-16 mx-auto mb-4 bg-green-100 text-green-600 rounded-full">
-        {question.icon}
-      </div>
-      <label className="text-2xl sm:text-3xl font-semibold mb-6 block text-gray-800">
-        {question.label}
-      </label>
-      <input
-        type="text"
-        name={question.name}
-        placeholder={question.placeholder}
-        value={value}
-        onChange={onChange}
-        onKeyPress={(e) => e.key === 'Enter' && onNext()}
-        className="w-full max-w-md mx-auto p-4 text-center text-lg bg-white border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-green-400 transition-all duration-300 text-gray-700 placeholder-gray-400"
-      />
-    </div>
-    <div className="mt-8 flex flex-col sm:flex-row justify-center items-center gap-4">
-      {!isFirst && (
-        <button onClick={onBack} className="flex items-center justify-center text-gray-500 font-semibold px-6 py-3 rounded-lg hover:bg-gray-100 transition-colors duration-300">
-          <Icons.Back /> Back
-        </button>
-      )}
-      <button onClick={onNext} className="w-full sm:w-auto bg-green-500 text-white font-bold px-8 py-3 rounded-lg hover:bg-green-600 transform hover:scale-105 transition-all duration-300 shadow-lg">
-        {isLast ? "Generate Recipe ✨" : "Next"}
-      </button>
-    </div>
-  </div>
-);
-
-// --- Main App Component ---
-
-const App = () => {
-  // Simplified and direct questions for clarity.
-  const questions = [
-    { name: "mealType", label: "What type of meal is it?", placeholder: "e.g., Breakfast, Lunch, Dinner", icon: <Icons.Meal /> },
-    { name: "mainIngredient", label: "What's your main ingredient?", placeholder: "e.g., Chicken, Tofu, Salmon", icon: <Icons.Ingredient /> },
-    { name: "cuisine", label: "Any specific cuisine?", placeholder: "e.g., Italian, Thai, Mexican", icon: <Icons.Cuisine /> },
-    { name: "spiceLevel", label: "How spicy should it be?", placeholder: "e.g., Mild, Medium, Hot", icon: <Icons.Spice /> },
-    { name: "timeAvailable", label: "How much time do you have?", placeholder: "e.g., 15, 30, 45 minutes", icon: <Icons.Time /> },
-  ];
-
-  // --- State Management ---
-  const [step, setStep] = useState(-1); // -1 for welcome screen
+const Airecipe = () => {
+  const [phase, setPhase] = useState('collecting'); // 'collecting', 'generating', 'finished'
+  const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState({});
+  const [currentInput, setCurrentInput] = useState('');
   const [recipe, setRecipe] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [saved, setSaved] = useState(false);
+  // Removed the recipeImageUrl state
 
-  // --- Event Handlers ---
-  const handleChange = (e) => {
-    setAnswers({ ...answers, [questions[step].name]: e.target.value });
-  };
 
-  const handleNext = () => {
-    if (step < questions.length - 1) {
-      if (answers[questions[step].name]?.trim()) {
-        setStep(step + 1);
-      }
+  useEffect(() => {
+    setIsLoggedIn(!!localStorage.getItem('token'));
+  }, []);
+
+  const handleSubmitAnswer = (e) => {
+    e.preventDefault();
+    if (!currentInput.trim()) return;
+
+    const currentQuestionName = questions[step].name;
+    const newAnswers = { ...answers, [currentQuestionName]: currentInput };
+    setAnswers(newAnswers);
+    setCurrentInput('');
+
+    const nextStep = step + 1;
+    if (nextStep < questions.length) {
+      setStep(nextStep);
     } else {
-      if (answers[questions[step].name]?.trim()) {
-        generateRecipe();
-      }
+      setPhase('generating');
+      generateRecipe(newAnswers);
     }
   };
 
-  const handleBack = () => {
-    if (step > 0) {
-      setStep(step - 1);
-    }
-  };
-
-  // --- API Calls ---
-  const generateRecipe = async () => {
-    setLoading(true);
-    setRecipe(null);
-    setSaved(false);
+  const generateRecipe = async (finalAnswers) => {
     try {
-      const res = await axios.post('https://find-my-recipe-backend.web.app/airecipe/ai-recipe-qusn', answers);
+      await new Promise(resolve => setTimeout(resolve, 3000));
+      const res = await axios.post('https://find-my-recipe-backend.web.app/airecipe/ai-recipe-qusn', finalAnswers);
       if (res.data.status && res.data.answer) {
         setRecipe(res.data.answer);
-      } else {
-        console.error("Invalid AI response", res.data);
+        // Image generation logic has been removed
+        setPhase('finished');
       }
     } catch (err) {
       console.error("Error generating recipe:", err);
     }
-    setLoading(false);
+
   };
 
-  const saveRecipe = async () => {
-    if (saved) return;
+  const handleStartOver = () => {
+    setPhase('collecting');
+    setStep(0);
+    setAnswers({});
+    setRecipe(null);
+    setSaved(false);
+    // Removed setRecipeImageUrl
+  };
+
+  const saveRecipe = async () => { 
+
     const token = localStorage.getItem("token");
+    if (!token || !recipe) return;
     try {
-      await axios.post('https://find-my-recipe-backend.web.app/airecipe/ai-recipe-save', recipe, { headers: { Authorization: `Bearer ${token}` } });
+
+      await axios.post('https://find-my-recipe-backend.web.app/airecipe/ai-recipe-save', recipe, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
       setSaved(true);
     } catch (err) {
       console.error("Error saving recipe:", err);
+      alert('Failed to save the recipe. Please try again.');
     }
   };
 
@@ -221,22 +167,157 @@ const App = () => {
   };
 
   return (
-    <>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
-        body { font-family: 'Poppins', sans-serif; }
-        .animate-fade-in { animation: fadeIn 0.7s ease-out forwards; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; translateY(0); } }
-      `}</style>
-      <div className="min-h-screen w-full bg-gray-50 p-4 flex flex-col items-center justify-center text-gray-800">
-        <main className="w-full max-w-3xl mx-auto">
-          <div className="bg-white p-6 sm:p-10 rounded-2xl shadow-2xl border border-gray-100 min-h-[500px] flex flex-col justify-center">
-            {renderContent()}
-          </div>
-        </main>
-      </div>
-    </>
+
+    <div className="h-screen w-full bg-[#f4f1ec] flex flex-col font-serif overflow-hidden">
+        <AnimatePresence mode="wait">
+            {phase === 'collecting' && (
+                <motion.div key="collecting" exit={{ opacity: 0 }} className="flex flex-grow w-full">
+                    {/* LEFT PANEL */}
+                    <div className="w-1/4 p-8 border-r border-gray-200 flex flex-col">
+                        <h2 className="text-2xl font-bold text-gray-800 mb-8">Your Preferences</h2>
+                        <div className="space-y-3">
+                            <AnimatePresence>
+                                {Object.entries(answers).map(([key, value]) => (
+                                    <motion.div 
+                                        key={key}
+                                        initial={{ opacity: 0, x: -20 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        exit={{ opacity: 0, x: 20 }}
+                                        className="bg-white p-3 rounded-lg border border-gray-200 shadow-sm"
+                                    >
+                                        <span className="font-semibold text-gray-500 text-sm capitalize">{key.replace(/([A-Z])/g, ' $1')}</span>
+                                        <p className="text-gray-800">{value}</p>
+                                    </motion.div>
+                                ))}
+                            </AnimatePresence>
+                        </div>
+                    </div>
+
+                    {/* CENTER PANEL */}
+                    <div className="flex-grow flex items-center justify-center p-8">
+                        <AnimatePresence mode="wait">
+                            <motion.div
+                                key={step}
+                                initial={{ opacity: 0, scale: 0.9 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                exit={{ opacity: 0, scale: 0.9 }}
+                                className="w-full max-w-xl text-center"
+                            >
+                                <h2 className="text-5xl font-bold text-gray-800 mb-8">{questions[step].label}</h2>
+                                <form onSubmit={handleSubmitAnswer}>
+                                    <input
+                                        type="text"
+                                        placeholder={questions[step].placeholder}
+                                        value={currentInput}
+                                        onChange={(e) => setCurrentInput(e.target.value)}
+                                        autoFocus
+                                        className="w-full text-center text-2xl p-4 bg-transparent border-b-2 border-gray-300 focus:border-orange-500 outline-none transition-colors"
+                                    />
+                                </form>
+                            </motion.div>
+                        </AnimatePresence>
+                    </div>
+
+                    {/* RIGHT PANEL */}
+                    <div className="w-1/4 p-8 border-l border-gray-200 flex flex-col justify-between">
+                       <div>
+                         <h2 className="text-2xl font-bold text-gray-800 mb-4">AI Status</h2>
+                         <p className="text-gray-600">Awaiting input for parameter <span className="font-semibold text-orange-600">{step + 1} of {questions.length}</span>.</p>
+                       </div>
+                       <div className="w-full h-1 bg-gray-200 rounded-full">
+                         <motion.div 
+                            className="h-1 bg-orange-500 rounded-full"
+                            initial={{ width: '0%' }}
+                            animate={{ width: `${((step + 1) / questions.length) * 100}%` }}
+                         />
+                       </div>
+                    </div>
+                </motion.div>
+            )}
+
+            {phase === 'generating' && (
+                <motion.div key="generating" initial={{ opacity: 0 }} animate={{ opacity: 1, transition: { delay: 0.5 } }} className="flex flex-col items-center justify-center flex-grow">
+                     <h2 className="text-5xl font-bold text-gray-800">Generating your masterpiece...</h2>
+                     <p className="text-gray-500 mt-4">Our AI is consulting with culinary experts from across the digital globe.</p>
+                     <div className="w-1/2 h-1 bg-gray-200 rounded-full mt-8 overflow-hidden">
+                        <motion.div 
+                           className="h-1 bg-gradient-to-r from-orange-400 to-red-500"
+                           initial={{ x: '-100%' }}
+                           animate={{ x: '100%' }}
+                           transition={{ duration: 3, repeat: Infinity, ease: 'linear' }}
+                        />
+                     </div>
+                </motion.div>
+            )}
+
+            {phase === 'finished' && recipe && (
+                 <motion.div 
+                    key="finished" 
+                    initial={{ opacity: 0, y: 20 }} 
+                    animate={{ opacity: 1, y: 0 }} 
+                    transition={{ delay: 0.3, duration: 0.6 }} 
+                    className="flex-grow w-full flex flex-col p-8 sm:p-12 bg-white shadow-xl rounded-lg m-4 lg:m-8 overflow-y-auto"
+                >
+                    {/* HEADER SECTION */}
+                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 flex-shrink-0">
+                        <div className='mb-4 md:mb-0'>
+                            <h1 className="text-5xl font-bold text-orange-700 leading-tight">
+                                {recipe.name}
+                            </h1>
+                            <p className="text-gray-600 text-lg mt-3 font-medium">⏱️ Prep Time: <span className="text-orange-600">{recipe.prep_time} mins</span></p>
+                        </div>
+                        <div className="flex flex-col md:flex-row items-stretch md:items-center space-y-3 md:space-y-0 md:space-x-4">
+                            {isLoggedIn ? ( 
+                                <button 
+                                    onClick={saveRecipe} 
+                                    disabled={saved} 
+                                    className={`text-lg px-6 py-3 rounded-lg font-semibold transition-colors shadow-md ${saved ? 'bg-gray-400 text-white cursor-not-allowed' : 'bg-green-600 text-white hover:bg-green-700'}`}
+                                >
+                                    {saved ? '✅ Saved!' : 'Save Recipe'}
+                                </button> 
+                            ) : ( 
+                                <Link to="/login" className="text-lg bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 shadow-md">
+                                    Login to Save
+                                </Link> 
+                            )}
+                            <button onClick={handleStartOver} className="text-lg bg-gray-200 text-gray-800 px-6 py-3 rounded-lg font-semibold hover:bg-gray-300 shadow-md">Create Another</button>
+                        </div>
+                    </div>
+
+                    {/* RECIPE DETAILS (SINGLE COLUMN LAYOUT) */}
+                    <div className="flex-grow pt-8 border-t border-gray-100">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+                            <motion.div 
+                                initial={{ opacity: 0, x: -30 }} 
+                                animate={{ opacity: 1, x: 0 }} 
+                                transition={{ delay: 0.5, duration: 0.6 }}
+                                className="md:col-span-1"
+                            >
+                                 <h3 className="text-3xl font-bold text-gray-800 mb-5 border-b pb-2 border-gray-200">Ingredients</h3>
+                                 <ul className="list-disc list-inside text-gray-700 space-y-3 text-lg pl-4">
+                                     {recipe.ingredients.map((ing, i) => <li key={i}>{ing}</li>)}
+                                 </ul>
+                            </motion.div>
+
+                            <motion.div 
+                                initial={{ opacity: 0, x: 30 }} 
+                                animate={{ opacity: 1, x: 0 }} 
+                                transition={{ delay: 0.7, duration: 0.6 }}
+                                className="md:col-span-2"
+                            >
+                                 <h3 className="text-3xl font-bold text-gray-800 mb-5 border-b pb-2 border-gray-200">Instructions</h3>
+                                 <ol className="list-decimal list-inside text-gray-700 space-y-4 text-lg pl-4">
+                                     {recipe.steps.map((step, i) => <li key={i}>{step}</li>)}
+                                 </ol>
+                            </motion.div>
+                        </div>
+                    </div>
+                 </motion.div>
+            )}
+        </AnimatePresence>
+    </div>
   );
 };
 
-export default App;
+export default Airecipe;
+

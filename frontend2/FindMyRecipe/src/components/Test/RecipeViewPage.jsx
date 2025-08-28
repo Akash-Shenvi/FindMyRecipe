@@ -25,9 +25,13 @@ const RecipeViewSkeleton = () => (
 
 // --- Helper Component: Reusable Recipe Card for Recommendations ---
 const RecipeCard = ({ item }) => (
-    <Link to={`/recipe/${encodeURIComponent(item.name)}`} className="min-w-[250px] flex-shrink-0 bg-white rounded-xl shadow-md border border-gray-200 hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
-      <img src={item.image_url} alt={item.name} className="w-full h-40 object-cover rounded-t-xl" />
-      <div className="p-3"><h3 className="text-lg font-semibold text-gray-800 mb-1 truncate">{item.name}</h3><p className="text-sm text-gray-600">{item.cuisine} • {item.course}</p></div>
+    // --- FIX IS HERE: Replaced min-w-[250px] with w-40 for a fixed width ---
+    <Link to={`/recipe/${encodeURIComponent(item.name)}`} className="w-40 flex-shrink-0 bg-white rounded-xl shadow-md border border-gray-200 hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+      <img src={item.image_url} alt={item.name} className="w-full aspect-video object-cover rounded-t-xl" />
+      <div className="p-3">
+          <h3 className="text-lg font-semibold text-gray-800 mb-1 truncate">{item.name}</h3>
+          <p className="text-sm text-gray-600">{item.cuisine} • {item.course}</p>
+      </div>
     </Link>
 );
 
@@ -54,16 +58,14 @@ const RecipeViewPage = () => {
 
         setRecipe(recipeRes.data);
         setRecommendations(recsRes.data.similar_recipes || []);
-        setLoading(false); // **FIX**: Set loading to false on success inside the try block
+        setLoading(false);
 
       } catch (err) {
-        // Only handle errors that are NOT cancellation errors
         if (!axios.isCancel(err)) {
           setError('❌ Could not load recipe.');
-          setLoading(false); // **FIX**: Set loading to false on error inside the catch block
+          setLoading(false);
         }
       }
-      // **FIX**: The 'finally' block that caused the error has been removed as it's no longer needed.
     };
 
     window.scrollTo(0, 0);
@@ -98,7 +100,7 @@ const RecipeViewPage = () => {
              <Link to="/home" className="text-2xl font-bold text-orange-600">🍽️ FindMyRecipe</Link>
              <nav className="space-x-6 text-md font-medium text-gray-700">
                 <Link to='/home' className="hover:text-orange-600">Home</Link>
-                <Link to='/about' className="hover:text-orange-600">About</Link>
+                <Link to='/about-us' className="hover:text-orange-600">About Us</Link>
                 <Link to='/contact' className="hover:text-orange-600">Contact</Link>
              </nav>
           </div>
@@ -110,7 +112,6 @@ const RecipeViewPage = () => {
         <img src={recipe.image_url} alt={recipe.name} className="w-full h-[300px] md:h-[500px] object-cover rounded-xl shadow-lg border-4 border-white" />
       </motion.div>
 
-      {/* ... the rest of your JSX remains the same ... */}
        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         <div className="md:col-span-2">
             {recipe.description && (
