@@ -19,6 +19,8 @@ import Airecipe from "./components/Ai-Recipe/Airecipe";
 import Intropage from "./components/Home/Intropage";
 import Savedrecipes from "./components/Ai-Recipe/Savedrecipe";
 import AboutUsPage from "./components/Home/AboutUsPage";
+import ProtectedRoute from "./components/Protectedroutes";
+import Protect from "./components/protect";
 function App() {
   return (
     <Routes>
@@ -38,21 +40,22 @@ function App() {
          
         }
       />
-      <Route path="/home" element={<Intro />} />
-      <Route path="/" element={<Intropage/>}/>
-      <Route path="/search-by-ingredients" element={<IngredientSearchPage />} /> 
-      <Route path="/search" element={<RecipeSearchPage />} />
-      <Route path="/upload" element={<UploadRecipePage />} />
-      <Route path="/profile" element={<ProfilePage />} />
-      <Route path="/forgot" element={<ForgotPassword />} />
-      <Route path="/Recipefind" element={<Recipefind />} />
-      <Route path="/recipe/:name" element={<RecipeView />} />
-      <Route path="/uploaded-recipes" element={<UploadedRecipesPage />} />
-      <Route path="/uploaded-recipes/:id" element={<UploadedRecipeDetailsPage />} />
-      <Route path="/edit-recipe/:id" element={<EditRecipePage />} />
-      <Route path="/ai-recipe" element={<Airecipe />} />
-      <Route path="/saved-recipes" element={<Savedrecipes />} />
+      <Route path="/" element={<Protect><Intropage/></Protect>}/>
+      <Route path="/home" element={<ProtectedRoute><Intro/></ProtectedRoute>} />
+      <Route path="/search-by-ingredients" element={<ProtectedRoute><IngredientSearchPage /></ProtectedRoute>} /> 
+      <Route path="/search" element={<ProtectedRoute><RecipeSearchPage /></ProtectedRoute>} />
+      <Route path="/upload" element={<ProtectedRoute><UploadRecipePage /></ProtectedRoute>} />
+      <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+      <Route path="/forgot" element={<ProtectedRoute><ForgotPassword /></ProtectedRoute>} />
+      <Route path="/Recipefind" element={<ProtectedRoute><Recipefind /></ProtectedRoute>} />
+      <Route path="/recipe/:name" element={<ProtectedRoute><RecipeView /></ProtectedRoute>} />
+      <Route path="/uploaded-recipes" element={<ProtectedRoute><UploadedRecipesPage /></ProtectedRoute>} />
+      <Route path="/uploaded-recipes/:id" element={<ProtectedRoute><UploadedRecipeDetailsPage /></ProtectedRoute>} />
+      <Route path="/edit-recipe/:id" element={<ProtectedRoute><EditRecipePage /></ProtectedRoute>} />
+      <Route path="/ai-recipe" element={<ProtectedRoute><Airecipe /></ProtectedRoute>} />
+      <Route path="/saved-recipes" element={<ProtectedRoute><Savedrecipes /></ProtectedRoute>} />
       <Route path="/about-us" element={<AboutUsPage />} />
+
     </Routes>
   );
 }
