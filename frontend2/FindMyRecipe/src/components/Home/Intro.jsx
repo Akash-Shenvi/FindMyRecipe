@@ -126,7 +126,7 @@ const HomePage = () => {
             className="mt-10 text-gray-700 text-base"
             variants={itemVariants}
           >
-            <p>Logged in as <span className="font-semibold text-yellow-500">{userName}</span>. Happy Cooking!</p>
+            {/* <p>Logged in as <span className="font-semibold text-yellow-500">{userName}</span>. Happy Cooking!</p> */}
           </motion.div>
         </motion.div>
       </main>

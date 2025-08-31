@@ -9,12 +9,31 @@ const RegisterPage = () => {
   const [otp, setOtp] = useState('');
   const [otpSent, setOtpSent] = useState(false);
   const [message, setMessage] = useState('');
-  const [isLoading, setIsLoading] = useState(false); // ✅ Loading state
+  const [isLoading, setIsLoading] = useState(false);
 
   const navigate = useNavigate();
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\w\s]).{8}$/;
+
+  const validatePassword = (password) => {
+    const errors = [];
+    if (password.length !== 8) {
+      errors.push('be exactly 8 characters long');
+    }
+    if (!/[A-Z]/.test(password)) {
+      errors.push('contain an uppercase letter');
+    }
+    if (!/[a-z]/.test(password)) {
+      errors.push('contain a lowercase letter');
+    }
+    if (!/\d/.test(password)) {
+      errors.push('contain a digit');
+    }
+    if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+      errors.push('contain a special character');
+    }
+    return errors;
+  };
 
   const sendOtp = async () => {
     if (!name || !email || !password) {
@@ -26,12 +45,14 @@ const RegisterPage = () => {
       setMessage('❌ Enter a valid email address.');
       return;
     }
-
-    if (!strongPasswordRegex.test(password)) {
-      setMessage('❌ Password must include uppercase, lowercase, number, and special character.');
+    
+    const passwordErrors = validatePassword(password);
+    if (passwordErrors.length > 0) {
+      setMessage(`❌ Password must: ${passwordErrors.join(', ')}.`);
       return;
     }
-
+    
+    setMessage('');
     setIsLoading(true);
     try {
       const res = await axios.post('https://find-my-recipe-backend.web.app/auth/send-email-otp-register', { email });
@@ -39,10 +60,11 @@ const RegisterPage = () => {
         setOtpSent(true);
         setMessage('✅ OTP sent to your email.');
       } else {
-        setMessage('❌ Failed to send OTP.');
+        setMessage(`❌ ${res.data.message || 'Failed to send OTP.'}`);
       }
     } catch (err) {
-      setMessage('❌ Error sending OTP.');
+      const errorMessage = err.response?.data?.message || 'Error sending OTP.';
+      setMessage(`❌ ${errorMessage}`);
     }
     setIsLoading(false);
   };
@@ -68,10 +90,11 @@ const RegisterPage = () => {
           navigate('/login');
         }, 2000);
       } else {
-        setMessage('❌ OTP verification failed.');
+        setMessage(`❌ ${res.data.message || 'OTP verification failed.'}`);
       }
     } catch (err) {
-      setMessage('❌ Verification failed. Try again later.');
+        const errorMessage = err.response?.data?.message || 'Verification failed. Try again later.';
+        setMessage(`❌ ${errorMessage}`);
     }
     setIsLoading(false);
   };
@@ -104,8 +127,9 @@ const RegisterPage = () => {
 
           <input
             type="password"
-            placeholder="Password"
+            placeholder="Password (8 chars, A-Z, a-z, 0-9, !@#..)"
             required
+            maxLength={8} // ✅ THIS IS THE NEW LINE
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             className="w-full px-6 py-4 text-lg text-black rounded-xl border border-gray-300 focus:outline-none focus:ring-4 focus:ring-indigo-400"

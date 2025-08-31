@@ -8,13 +8,48 @@ const LoginPage = () => {
   const [message, setMessage] = useState('');
   const navigate = useNavigate();
 
+  const validatePassword = (password) => {
+    const errors = [];
+
+    // Rule 1: Exactly 8 characters long
+    if (password.length !== 8) {
+      errors.push('must be exactly 8 characters long');
+    }
+
+    // Rule 2: Must include an uppercase letter
+    if (!/[A-Z]/.test(password)) {
+      errors.push('must include an uppercase letter');
+    }
+
+    // Rule 3: Must include a lowercase letter
+    if (!/[a-z]/.test(password)) {
+      errors.push('must include a lowercase letter');
+    }
+
+    // Rule 4: Must include a digit
+    if (!/\d/.test(password)) {
+      errors.push('must include a digit');
+    }
+
+    // Rule 5: Must include a special character
+    if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+      errors.push('must include a special character');
+    }
+
+    return errors;
+  };
+
   const handleLogin = async (e) => {
     e.preventDefault();
 
-    if (password.length < 8) {
-      setMessage('❌ Password must be at least 8 characters long.');
+    // New validation logic
+    const passwordErrors = validatePassword(password);
+    if (passwordErrors.length > 0) {
+      setMessage(`❌ Password error: ${passwordErrors.join(', ')}.`);
       return;
     }
+
+    setMessage(''); // Clear previous messages before trying to log in
 
     try {
       const res = await axios.post('https://find-my-recipe-backend.web.app/auth/login', {
@@ -31,11 +66,12 @@ const LoginPage = () => {
         }, 2000);
 
       } else {
-        setMessage('❌ Invalid credentials');
+        setMessage(`❌ ${res.data.message || 'Invalid credentials'}`);
       }
     } catch (err) {
       console.error(err);
-      setMessage('❌ Login failed. Try again later.');
+      const errorMessage = err.response?.data?.message || 'Login failed. Try again later.';
+      setMessage(`❌ ${errorMessage}`);
     }
   };
 
@@ -89,8 +125,9 @@ const LoginPage = () => {
           />
           <input
             type="password"
-            placeholder="Password (min 8 characters)"
+            placeholder="Password (8 chars, A-Z, a-z, 0-9, !@#..)"
             required
+            maxLength={8} // ✅ THIS IS THE NEW LINE
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             className="w-full px-6 py-4 text-lg text-black rounded-xl border border-gray-300 focus:outline-none focus:ring-4 focus:ring-indigo-400"
