@@ -31,15 +31,30 @@ const PlusIcon = () => ( <svg xmlns="http://www.w3.org/2000/svg" className="h-8 
 
 const HomePage = () => {
   const navigate = useNavigate();
-  const [userName, setUserName] = useState('User');
+  // MODIFIED: Initialize state directly from localStorage.
+  // This prevents the UI from briefly showing "User" before updating.
+  const [userName, setUserName] = useState(() => localStorage.getItem('profileName') || 'User');
   const [isFabOpen, setIsFabOpen] = useState(false); // State for the circular menu
 
+  // MODIFIED: This effect now listens for changes to localStorage across tabs/windows.
   useEffect(() => {
-    const storedName = localStorage.getItem('profileName');
-    if (storedName) {
-      setUserName(storedName);
-    }
-  }, []);
+    // This function will run when any item in localStorage changes.
+    const handleStorageChange = (e) => {
+      // We only care if the 'profileName' key was the one that changed.
+      if (e.key === 'profileName') {
+        setUserName(e.newValue || 'User');
+      }
+    };
+
+    // Add the event listener to the window object.
+    window.addEventListener('storage', handleStorageChange);
+
+    // This is a crucial cleanup step. 
+    // It removes the listener when the component is unmounted to prevent memory leaks.
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, []); // The empty array [] means this effect only runs once to set up the listener.
 
   const fabOptions = [
     { icon: <SparklesIcon />, label: 'Generate with AI', path: '/ai-recipe' },
@@ -116,7 +131,7 @@ const HomePage = () => {
         </motion.div>
       </main>
 
-      {/* --- NEW: CIRCULAR FLOATING ACTION BUTTON MENU --- */}
+      {/* --- CIRCULAR FLOATING ACTION BUTTON MENU (Unchanged) --- */}
       <div
         className="fixed bottom-6 right-6 sm:bottom-8 sm:right-8 z-30"
         onMouseEnter={() => setIsFabOpen(true)}

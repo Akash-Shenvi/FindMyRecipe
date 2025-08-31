@@ -80,7 +80,7 @@ const Navbar = () => {
         <nav className="flex items-center space-x-6 text-md font-medium">
           <Link to="/" className="hover:text-yellow-300">Home</Link>
           <Link to="/about-us" className="hover:text-yellow-300">About Us</Link>
-          <Link to="/contact" className="hover:text-yellow-300">Contact</Link>
+          
 
           {/* Profile Dropdown */}
           <div className="relative" ref={dropdownRef}>
@@ -117,7 +117,7 @@ const Navbar = () => {
             )}
             </AnimatePresence>
           </div>
-<ThemeToggleButton />
+{/* <ThemeToggleButton /> */}
         </nav>
  
       </div>

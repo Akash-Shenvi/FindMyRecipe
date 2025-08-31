@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import React, { useState, useEffect} from 'react';
+import { useNavigate} from 'react-router-dom';
 import axios from 'axios';
 import defaultProfileImage from '../../assets/profile.png';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -94,37 +94,55 @@ const ProfilePage = () => {
     };
 
     const handleSave = async () => {
-        setIsSaving(true);
-        try {
-            const formData = new FormData();
-            formData.append('name', editedProfile.name);
-            formData.append('email', editedProfile.email);
-            formData.append('phone', editedProfile.phone || '');
-            formData.append('age', editedProfile.age || '');
-            formData.append('bio', editedProfile.bio || '');
-            if (selectedImageFile) {
-                formData.append('image', selectedImageFile);
-            }
-
-            const res = await axios.put('https://find-my-recipe-backend.web.app/auth/update-profile', formData, {
-                headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'multipart/form-data' },
-            });
-
-            if (res.data.success && res.data.user) {
-                setIsEditing(false);
-                setSelectedImageFile(null);
-                showMessage('Profile updated successfully!', 'success');
-                fetchProfile(); // Refetch profile to get final data
-                window.dispatchEvent(new Event('profileUpdated')); // Notify navbar
-            } else {
-                showMessage(res.data.message || 'Update failed', 'error');
-            }
-        } catch (err) {
-            showMessage('Error updating profile', 'error');
-        } finally {
-            setIsSaving(false);
+    setIsSaving(true);
+    try {
+        const formData = new FormData();
+        formData.append('name', editedProfile.name);
+        formData.append('email', editedProfile.email);
+        formData.append('phone', editedProfile.phone || '');
+        formData.append('age', editedProfile.age || '');
+        formData.append('bio', editedProfile.bio || '');
+        if (selectedImageFile) {
+            formData.append('image', selectedImageFile);
         }
-    };
+
+        const res = await axios.put('https://find-my-recipe-backend.web.app/auth/update-profile', formData, {
+            headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'multipart/form-data' },
+        });
+
+        if (res.data.success && res.data.user) {
+            const updatedUser = res.data.user;
+            const fullUpdatedProfile = { name: '', email: '', phone: '', age: '', bio: '', ...updatedUser };
+
+            // Use the response data directly
+            setProfile(fullUpdatedProfile);
+            setEditedProfile(fullUpdatedProfile); 
+            
+            // --- THIS IS THE FIX ---
+            // 1. Update localStorage with the new name.
+            localStorage.setItem('profileName', fullUpdatedProfile.name);
+            
+            // 2. Manually dispatch a 'storage' event. This ensures the HomePage
+            // listener in the SAME tab fires immediately.
+            window.dispatchEvent(new Event('storage'));
+            // --- END OF FIX ---
+
+            setIsEditing(false);
+            setSelectedImageFile(null);
+            showMessage('Profile updated successfully!', 'success');
+            
+            // This event is still useful for other components like a Navbar
+            window.dispatchEvent(new Event('profileUpdated'));
+
+        } else {
+            showMessage(res.data.message || 'Update failed', 'error');
+        }
+    } catch (err) {
+        showMessage('Error updating profile', 'error');
+    } finally {
+        setIsSaving(false);
+    }
+};
 
     const handleCancel = () => {
         setEditedProfile(profile);

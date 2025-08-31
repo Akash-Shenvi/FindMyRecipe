@@ -34,7 +34,7 @@ const RecipeSearchPage = () => {
           <nav className="space-x-6 text-md font-medium text-white">
             <button onClick={() => navigate('/')} className="hover:text-yellow-400">Home</button>
             <button onClick={() => navigate('/about')} className="hover:text-yellow-400">About Us</button>
-            <button onClick={() => navigate('/contact')} className="hover:text-yellow-400">Contact Us</button>
+           
           </nav>
         </div>
       </header>
