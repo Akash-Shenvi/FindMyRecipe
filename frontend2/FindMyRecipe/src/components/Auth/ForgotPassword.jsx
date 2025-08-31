@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
 
 const ForgotPassword = () => {
   const [step, setStep] = useState(1);
@@ -8,15 +7,38 @@ const ForgotPassword = () => {
   const [otp, setOtp] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [message, setMessage] = useState('');
-  const [isLoading, setIsLoading] = useState(false); // ✅ Common loading state
+  const [isLoading, setIsLoading] = useState(false);
+
+  // ✅ Reuse the same validation logic as LoginPage
+  const validatePassword = (password) => {
+    const errors = [];
+
+    if (password.length !== 8) {
+      errors.push('must be exactly 8 characters long');
+    }
+    if (!/[A-Z]/.test(password)) {
+      errors.push('must include an uppercase letter');
+    }
+    if (!/[a-z]/.test(password)) {
+      errors.push('must include a lowercase letter');
+    }
+    if (!/\d/.test(password)) {
+      errors.push('must include a digit');
+    }
+    if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+      errors.push('must include a special character');
+    }
+
+    return errors;
+  };
 
   const sendOtp = async () => {
     setIsLoading(true);
     try {
-      const res = await axios.post('https://find-my-recipe-backend.web.app/auth/send-email-otp-forgotpassword', {
-        email: emailOrMobile,
-      });
-
+      const res = await axios.post(
+        'https://find-my-recipe-backend.web.app/auth/send-email-otp-forgotpassword',
+        { email: emailOrMobile }
+      );
       if (res.data.success) {
         setStep(2);
         setMessage('✅ OTP sent successfully!');
@@ -33,11 +55,10 @@ const ForgotPassword = () => {
   const verifyOtp = async () => {
     setIsLoading(true);
     try {
-      const res = await axios.post('https://find-my-recipe-backend.web.app/auth/forgot-password/verify-otp', {
-        identifier: emailOrMobile,
-        otp,
-      });
-
+      const res = await axios.post(
+        'https://find-my-recipe-backend.web.app/auth/forgot-password/verify-otp',
+        { identifier: emailOrMobile, otp }
+      );
       if (res.data.success) {
         setStep(3);
         setMessage('✅ OTP verified. Now reset your password.');
@@ -51,13 +72,19 @@ const ForgotPassword = () => {
   };
 
   const resetPassword = async () => {
+    // ✅ Validate password before sending request
+    const passwordErrors = validatePassword(newPassword);
+    if (passwordErrors.length > 0) {
+      setMessage(`❌ Password error: ${passwordErrors.join(', ')}.`);
+      return;
+    }
+
     setIsLoading(true);
     try {
-      const res = await axios.post('https://find-my-recipe-backend.web.app/auth/forgot-password/reset', {
-        identifier: emailOrMobile,
-        newPassword,
-      });
-
+      const res = await axios.post(
+        'https://find-my-recipe-backend.web.app/auth/forgot-password/reset',
+        { identifier: emailOrMobile, newPassword }
+      );
       if (res.data.success) {
         setMessage('✅ Password reset successfully! You can now log in.');
         setStep(1);
@@ -128,8 +155,9 @@ const ForgotPassword = () => {
           <>
             <input
               type="password"
-              placeholder="Enter new password"
+              placeholder="Password (8 chars, A-Z, a-z, 0-9, !@#..)"
               value={newPassword}
+              maxLength={8} // ✅ Match LoginPage rule
               onChange={(e) => setNewPassword(e.target.value)}
               className="w-full px-4 py-3 mb-4 text-lg rounded-xl border border-gray-300 focus:outline-none focus:ring-4 focus:ring-indigo-400"
             />

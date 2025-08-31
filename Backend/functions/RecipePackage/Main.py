@@ -12,7 +12,7 @@ from authlib.integrations.flask_client import OAuth
 from RecipePackage.oauth import oauth, configure_oauth
 from RecipePackage.Recipes.recipes import recipe
 from RecipePackage.Airecipe.airecipe import airecipe
-
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 
 app = Flask(__name__)
@@ -20,7 +20,7 @@ configure_oauth(app)
 with open(os.path.join(os.path.dirname(__file__), '../config.json')) as f:
     config_data = json.load(f)
 SECRET_KEY = config_data['secret_key']
-
+app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 print(SECRET_KEY)
 
 

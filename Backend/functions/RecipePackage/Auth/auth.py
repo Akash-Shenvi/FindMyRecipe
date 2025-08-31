@@ -285,19 +285,26 @@ def update_profile():
 
 
 
-@authp.route('/google-login',methods=['Get'])
+@authp.route('/google-login',methods=['GET'])
 def google_login():
+    from flask import request, session
     google = oauth.create_client('google')
-    redirect_uri = url_for('auth.google_callback', _external=True)
+    redirect_uri = "https://recipe-api-k26hqvqwva-uc.a.run.app/auth/google/callback"
+    
+    # This line is perfect!
+    session['oauth_origin'] = request.args.get('origin', 'https://find-my-recipe-6bf86.web.app')
+
     return google.authorize_redirect(redirect_uri)
+   
 
 @authp.route('/google/callback')
 def google_callback():
+    from flask import session
     google = oauth.create_client('google')
     token = google.authorize_access_token()
     resp = google.get('userinfo')
     user_info = resp.json()
-
+    target_origin = session.pop('oauth_origin', 'https://find-my-recipe-6bf86.web.app')
     # Optional: store user if new
     email = user_info.get('email')
     name = user_info.get('name')
@@ -319,7 +326,7 @@ def google_callback():
   window.opener.postMessage({{
     token: "{access_token}",
     message: "Login with Google successful"
-  }}, "https://find-my-recipe-6bf86.web.app");
+  }}, "{target_origin}");
   window.close();
 </script>
 """

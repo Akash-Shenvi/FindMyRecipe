@@ -76,16 +76,21 @@ const LoginPage = () => {
   };
 
   const handleGoogleLogin = () => {
+    const origin = window.location.origin;
     const popup = window.open(
-      'https://recipe-api-k26hqvqwva-uc.a.run.app/auth/google-login',
+      `https://recipe-api-k26hqvqwva-uc.a.run.app/auth/google-login?origin=${origin}`,
       'googleLogin',
       'width=500,height=600'
     );
 
     const listener = (event) => {
-      if (event.origin !== 'https://find-my-recipe-backend.web.app') return;
+      if (event.origin !== 'https://recipe-api-k26hqvqwva-uc.a.run.app') return;
 
       const { token, message } = event.data;
+      console.log('Received message:', event.data);
+      console.log('Token:', token);
+      console.log('Message:', message);
+
       if (token) {
         localStorage.setItem('token', token);
         setMessage('✅ ' + message);
